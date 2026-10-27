@@ -34,28 +34,17 @@
   border-bottom: 1px dashed rgba(255, 255, 255, 0.55);
 }
 
-/* 8 Resize Handles */
-.crop-handle {
+/* Corner brackets for viewfinder aesthetic (resizing is done via buttons, pan to move) */
+.crop-corner {
   position: absolute;
-  width: 24px;
-  height: 24px;
-  background: #ffffff;
-  border: 2px solid var(--brand-purple);
-  border-radius: 50%;
-  box-shadow: var(--shadow-sm);
-  pointer-events: auto;
-  touch-action: none;
-  transform: translate(-50%, -50%);
-  z-index: 10;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
 }
-.crop-handle-tl { top: 0; left: 0; cursor: nwse-resize; }
-.crop-handle-tc { top: 0; left: 50%; cursor: ns-resize; }
-.crop-handle-tr { top: 0; left: 100%; cursor: nesw-resize; }
-.crop-handle-ml { top: 50%; left: 0; cursor: ew-resize; }
-.crop-handle-mr { top: 50%; left: 100%; cursor: ew-resize; }
-.crop-handle-bl { top: 100%; left: 0; cursor: nesw-resize; }
-.crop-handle-bc { top: 100%; left: 50%; cursor: ns-resize; }
-.crop-handle-br { top: 100%; left: 100%; cursor: nwse-resize; }
+.crop-corner-tl { top: -2px; left: -2px; border-top: 3.5px solid #ffffff; border-left: 3.5px solid #ffffff; }
+.crop-corner-tr { top: -2px; right: -2px; border-top: 3.5px solid #ffffff; border-right: 3.5px solid #ffffff; }
+.crop-corner-bl { bottom: -2px; left: -2px; border-bottom: 3.5px solid #ffffff; border-left: 3.5px solid #ffffff; }
+.crop-corner-br { bottom: -2px; right: -2px; border-bottom: 3.5px solid #ffffff; border-right: 3.5px solid #ffffff; }
 
 /* 2. PERSPECTIVE SCANNER OVERLAY */
 .scanner-overlay {

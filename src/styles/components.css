@@ -137,6 +137,66 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Button-based Crop Controls Clusters */
+.crop-controls-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 2px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.crop-controls-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.crop-control-cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-hover);
+  padding: 4px 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-base);
+  flex-shrink: 0;
+}
+
+.cluster-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.btn-cluster-action {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.15s ease;
+}
+.btn-cluster-action:hover {
+  background: #ffffff;
+  color: var(--brand-purple);
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: var(--shadow-sm);
+}
+.btn-cluster-action:active {
+  transform: scale(0.92);
+}
+
 /* 2. CHIPS & PRESET PILLS */
 .chip-group {
   display: flex;

@@ -141,6 +141,16 @@ export class CanvasManager {
     this.applyTransform();
   }
 
+  private gesturesEnabled: boolean = true;
+
+  public setGesturesEnabled(enabled: boolean): void {
+    this.gesturesEnabled = enabled;
+  }
+
+  public getGesturesEnabled(): boolean {
+    return this.gesturesEnabled;
+  }
+
   public applyTransform(): void {
     this.stageEl.style.transform = `translate(${this.panX}px, ${this.panY}px) scale(${this.scale})`;
     this.notifyTransform();
@@ -162,6 +172,55 @@ export class CanvasManager {
     this.applyTransform();
   }
 
+  /**
+   * Zoom image in by 20%
+   */
+  public zoomIn(factor: number = 1.2): void {
+    if (!this.hasImage) return;
+    this.scale = Math.min(5, +(this.scale * factor).toFixed(4));
+    this.applyTransform();
+  }
+
+  /**
+   * Zoom image out by 20%
+   */
+  public zoomOut(factor: number = 1.2): void {
+    if (!this.hasImage) return;
+    this.scale = Math.max(0.1, +(this.scale / factor).toFixed(4));
+    this.applyTransform();
+  }
+
+  /**
+   * Pan image by 10% of displayed size, minimum 50px
+   */
+  public panByDirection(dir: 'up' | 'down' | 'left' | 'right'): void {
+    if (!this.hasImage) return;
+    const stepX = Math.max(50, Math.round(this.canvas.width * this.scale * 0.1));
+    const stepY = Math.max(50, Math.round(this.canvas.height * this.scale * 0.1));
+
+    switch (dir) {
+      case 'left':
+        this.panX -= stepX;
+        break;
+      case 'right':
+        this.panX += stepX;
+        break;
+      case 'up':
+        this.panY -= stepY;
+        break;
+      case 'down':
+        this.panY += stepY;
+        break;
+    }
+    this.applyTransform();
+  }
+
+  public resetPan(): void {
+    this.panX = 0;
+    this.panY = 0;
+    this.applyTransform();
+  }
+
   public setPan(x: number, y: number): void {
     this.panX = x;
     this.panY = y;
@@ -169,19 +228,21 @@ export class CanvasManager {
   }
 
   private setupViewportEvents(): void {
-    // Wheel Zoom
+    // Wheel Zoom (only if gestures are enabled)
     this.viewportEl.addEventListener('wheel', (e) => {
+      if (!this.gesturesEnabled) return;
       if (e.target !== this.viewportEl && !this.stageEl.contains(e.target as Node)) return;
       e.preventDefault();
       const delta = e.deltaY < 0 ? 0.08 : -0.08;
       this.zoom(delta, e.clientX, e.clientY);
     }, { passive: false });
 
-    // Touch Pinch-to-zoom
+    // Touch Pinch-to-zoom (only if gestures are enabled)
     let initialDistance = 0;
     let initialScale = 1;
 
     this.viewportEl.addEventListener('touchstart', (e) => {
+      if (!this.gesturesEnabled) return;
       if (e.touches.length === 2) {
         e.preventDefault();
         const t1 = e.touches[0];
@@ -192,6 +253,7 @@ export class CanvasManager {
     }, { passive: false });
 
     this.viewportEl.addEventListener('touchmove', (e) => {
+      if (!this.gesturesEnabled) return;
       if (e.touches.length === 2) {
         e.preventDefault();
         const t1 = e.touches[0];

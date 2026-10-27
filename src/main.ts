@@ -445,6 +445,37 @@ class PicStudioApp {
       };
     });
 
+    // 1. Crop Frame Size Buttons
+    const btnCropShrink = document.getElementById('btnCropFrameShrink');
+    const btnCropExpand = document.getElementById('btnCropFrameExpand');
+    const btnCropMax = document.getElementById('btnCropFrameMax');
+
+    if (btnCropShrink) btnCropShrink.onclick = () => this.cropUI.resizeCropFrame(false, 0.1);
+    if (btnCropExpand) btnCropExpand.onclick = () => this.cropUI.resizeCropFrame(true, 0.1);
+    if (btnCropMax) btnCropMax.onclick = () => this.cropUI.maximizeCropFrame();
+
+    // 2. Image Zoom Buttons (±20%)
+    const btnImgZoomIn = document.getElementById('btnImgZoomIn');
+    const btnImgZoomOut = document.getElementById('btnImgZoomOut');
+    const btnImgZoomFit = document.getElementById('btnImgZoomFit');
+
+    if (btnImgZoomIn) btnImgZoomIn.onclick = () => this.canvasManager.zoomIn(1.2);
+    if (btnImgZoomOut) btnImgZoomOut.onclick = () => this.canvasManager.zoomOut(1.2);
+    if (btnImgZoomFit) btnImgZoomFit.onclick = () => this.canvasManager.fitToViewport();
+
+    // 3. Image Pan Buttons (10% of image size, min 50px)
+    const btnPanLeft = document.getElementById('btnImgPanLeft');
+    const btnPanRight = document.getElementById('btnImgPanRight');
+    const btnPanUp = document.getElementById('btnImgPanUp');
+    const btnPanDown = document.getElementById('btnImgPanDown');
+    const btnPanCenter = document.getElementById('btnImgPanCenter');
+
+    if (btnPanLeft) btnPanLeft.onclick = () => this.canvasManager.panByDirection('left');
+    if (btnPanRight) btnPanRight.onclick = () => this.canvasManager.panByDirection('right');
+    if (btnPanUp) btnPanUp.onclick = () => this.canvasManager.panByDirection('up');
+    if (btnPanDown) btnPanDown.onclick = () => this.canvasManager.panByDirection('down');
+    if (btnPanCenter) btnPanCenter.onclick = () => this.canvasManager.resetPan();
+
     // Rotate & Flip buttons
     const btnRotL = document.getElementById('btnRotateLeft');
     const btnRotR = document.getElementById('btnRotateRight');
@@ -462,6 +493,7 @@ class PicStudioApp {
         document.querySelectorAll('#panelCrop [data-crop-ratio]').forEach(c => c.classList.remove('active'));
         document.querySelector('#panelCrop [data-crop-ratio="free"]')?.classList.add('active');
         this.cropUI.setPreset('free');
+        this.canvasManager.fitToViewport();
       };
     }
     if (btnApplyCrop) btnApplyCrop.onclick = () => this.cropUI.applyCrop();

@@ -9,7 +9,6 @@ export class CropUI {
 
   private currentPreset: AspectRatioPreset = 'free';
   private cropBox: Rect = { x: 0, y: 0, width: 0, height: 0 };
-  private activeHandle: string | null = null;
   private isDraggingBox: boolean = false;
   private dragStartX: number = 0;
   private dragStartY: number = 0;
@@ -33,16 +32,17 @@ export class CropUI {
   private isPointerEventsSetup: boolean = false;
 
   public activate(): void {
+    this.canvasManager.setGesturesEnabled(false);
     this.container.classList.remove('hidden');
     this.render();
     this.resetCropBox();
   }
 
   public deactivate(): void {
+    this.canvasManager.setGesturesEnabled(true);
     this.container.classList.add('hidden');
     this.container.innerHTML = '';
     this.cropBoxEl = null;
-    this.activeHandle = null;
     this.isDraggingBox = false;
   }
 
@@ -50,6 +50,64 @@ export class CropUI {
     this.currentPreset = preset;
     const dims = this.canvasManager.getDimensions();
     this.cropBox = CropEngine.getDefaultCropBox(dims.width, dims.height, preset);
+    this.syncDOM();
+  }
+
+  /**
+   * Increase or decrease crop frame size by button
+   */
+  public resizeCropFrame(expand: boolean, percent: number = 0.1): void {
+    const dims = this.canvasManager.getDimensions();
+    const ratio = CropEngine.getAspectRatioValue(this.currentPreset);
+
+    const deltaW = Math.max(30, Math.round(dims.width * percent));
+    let newW = expand ? this.cropBox.width + deltaW : this.cropBox.width - deltaW;
+    let newH = ratio ? newW / ratio : (expand ? this.cropBox.height + Math.max(30, Math.round(dims.height * percent)) : this.cropBox.height - Math.max(30, Math.round(dims.height * percent)));
+
+    const minSize = 50;
+    if (newW < minSize) {
+      newW = minSize;
+      if (ratio) newH = newW / ratio;
+    }
+    if (newH < minSize) {
+      newH = minSize;
+      if (ratio) newW = newH * ratio;
+    }
+
+    if (newW > dims.width) {
+      newW = dims.width;
+      if (ratio) newH = newW / ratio;
+    }
+    if (newH > dims.height) {
+      newH = dims.height;
+      if (ratio) newW = newH * ratio;
+    }
+
+    // Keep crop box centered around current center
+    const curCenterX = this.cropBox.x + this.cropBox.width / 2;
+    const curCenterY = this.cropBox.y + this.cropBox.height / 2;
+
+    let newX = Math.round(curCenterX - newW / 2);
+    let newY = Math.round(curCenterY - newH / 2);
+
+    newX = Math.max(0, Math.min(dims.width - Math.round(newW), newX));
+    newY = Math.max(0, Math.min(dims.height - Math.round(newH), newY));
+
+    this.cropBox = {
+      x: newX,
+      y: newY,
+      width: Math.round(newW),
+      height: Math.round(newH),
+    };
+    this.syncDOM();
+  }
+
+  /**
+   * Reset crop frame to maximum fit within the image
+   */
+  public maximizeCropFrame(): void {
+    const dims = this.canvasManager.getDimensions();
+    this.cropBox = CropEngine.getDefaultCropBox(dims.width, dims.height, this.currentPreset);
     this.syncDOM();
   }
 
@@ -116,14 +174,10 @@ export class CropUI {
           <div class="crop-grid-line"></div>
           <div></div>
         </div>
-        <div class="crop-handle crop-handle-tl" data-handle="tl"></div>
-        <div class="crop-handle crop-handle-tc" data-handle="tc"></div>
-        <div class="crop-handle crop-handle-tr" data-handle="tr"></div>
-        <div class="crop-handle crop-handle-ml" data-handle="ml"></div>
-        <div class="crop-handle crop-handle-mr" data-handle="mr"></div>
-        <div class="crop-handle crop-handle-bl" data-handle="bl"></div>
-        <div class="crop-handle crop-handle-bc" data-handle="bc"></div>
-        <div class="crop-handle crop-handle-br" data-handle="br"></div>
+        <div class="crop-corner crop-corner-tl"></div>
+        <div class="crop-corner crop-corner-tr"></div>
+        <div class="crop-corner crop-corner-bl"></div>
+        <div class="crop-corner crop-corner-br"></div>
       </div>
     `;
 
@@ -144,20 +198,11 @@ export class CropUI {
     if (this.isPointerEventsSetup) return;
     this.isPointerEventsSetup = true;
 
-    // Handle drag on handles or body
+    // Pan gesture: Drag anywhere inside the crop box to move it
     this.container.addEventListener('pointerdown', (e) => {
       const target = e.target as HTMLElement;
-      const handle = target.dataset.handle;
 
-      if (handle) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.activeHandle = handle;
-        this.dragStartX = e.clientX;
-        this.dragStartY = e.clientY;
-        this.initialCropBox = { ...this.cropBox };
-        target.setPointerCapture(e.pointerId);
-      } else if (target === this.cropBoxEl || this.cropBoxEl?.contains(target)) {
+      if (target === this.cropBoxEl || this.cropBoxEl?.contains(target)) {
         e.preventDefault();
         e.stopPropagation();
         this.isDraggingBox = true;
@@ -169,7 +214,7 @@ export class CropUI {
     });
 
     const onPointerMove = (e: PointerEvent) => {
-      if (!this.activeHandle && !this.isDraggingBox) return;
+      if (!this.isDraggingBox) return;
       const transform = this.canvasManager.getTransform();
       const dims = this.canvasManager.getDimensions();
 
@@ -177,97 +222,23 @@ export class CropUI {
       const dx = (e.clientX - this.dragStartX) / transform.scale;
       const dy = (e.clientY - this.dragStartY) / transform.scale;
 
-      if (this.isDraggingBox) {
-        let nx = this.initialCropBox.x + dx;
-        let ny = this.initialCropBox.y + dy;
+      let nx = this.initialCropBox.x + dx;
+      let ny = this.initialCropBox.y + dy;
 
-        nx = Math.max(0, Math.min(dims.width - this.initialCropBox.width, nx));
-        ny = Math.max(0, Math.min(dims.height - this.initialCropBox.height, ny));
+      nx = Math.max(0, Math.min(dims.width - this.initialCropBox.width, nx));
+      ny = Math.max(0, Math.min(dims.height - this.initialCropBox.height, ny));
 
-        this.cropBox.x = Math.round(nx);
-        this.cropBox.y = Math.round(ny);
-        this.syncDOM();
-        return;
-      }
-
-      if (this.activeHandle) {
-        this.handleResize(this.activeHandle, dx, dy, dims.width, dims.height);
-        this.syncDOM();
-      }
+      this.cropBox.x = Math.round(nx);
+      this.cropBox.y = Math.round(ny);
+      this.syncDOM();
     };
 
     const onPointerUp = () => {
-      this.activeHandle = null;
       this.isDraggingBox = false;
     };
 
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('pointercancel', onPointerUp);
-  }
-
-  private handleResize(
-    handle: string,
-    dx: number,
-    dy: number,
-    maxWidth: number,
-    maxHeight: number
-  ): void {
-    const initial = this.initialCropBox;
-    const ratio = CropEngine.getAspectRatioValue(this.currentPreset);
-
-    let x = initial.x;
-    let y = initial.y;
-    let w = initial.width;
-    let h = initial.height;
-
-    const minSize = 20;
-
-    if (handle.includes('r')) {
-      w = Math.max(minSize, initial.width + dx);
-    }
-    if (handle.includes('l')) {
-      const newW = Math.max(minSize, initial.width - dx);
-      x = initial.x + (initial.width - newW);
-      w = newW;
-    }
-    if (handle.includes('b')) {
-      h = Math.max(minSize, initial.height + dy);
-    }
-    if (handle.includes('t')) {
-      const newH = Math.max(minSize, initial.height - dy);
-      y = initial.y + (initial.height - newH);
-      h = newH;
-    }
-
-    // Lock aspect ratio if required
-    if (ratio) {
-      if (handle === 'tc' || handle === 'bc') {
-        w = h * ratio;
-        x = initial.x + (initial.width - w) / 2;
-      } else if (handle === 'ml' || handle === 'mr') {
-        h = w / ratio;
-        y = initial.y + (initial.height - h) / 2;
-      } else {
-        // Corner handles: sync height to width
-        h = w / ratio;
-        if (handle.includes('t')) {
-          y = initial.y + initial.height - h;
-        }
-      }
-    }
-
-    // Clamp inside image bounds
-    if (x < 0) { w += x; x = 0; }
-    if (y < 0) { h += y; y = 0; }
-    if (x + w > maxWidth) { w = maxWidth - x; }
-    if (y + h > maxHeight) { h = maxHeight - y; }
-
-    this.cropBox = {
-      x: Math.round(x),
-      y: Math.round(y),
-      width: Math.round(w),
-      height: Math.round(h),
-    };
   }
 }
