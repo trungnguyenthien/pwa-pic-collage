@@ -86,51 +86,81 @@
 
     <!-- 2. MAIN WORKSPACE VIEWPORT -->
     <main class="app-main" id="mainArea">
-      <div class="canvas-viewport" id="viewport">
-        <!-- Floating HUD -->
-        <div class="viewport-hud" id="hudTag">
-          <span id="hudDimensions" class="tabular-nums">PicStudio Ready</span>
-        </div>
-
-        <!-- Empty State Dropzone -->
-        <div class="dropzone" id="dropzone">
-          <div class="dropzone-icon-badge">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-              <circle cx="9" cy="9" r="2"/>
-              <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-            </svg>
+      <div class="workspace-area">
+        <!-- Queue Bar for Batch Image Processing -->
+        <div class="queue-bar hidden" id="queueBar">
+          <div class="queue-header-tag">
+            <span class="queue-title">Hàng đợi:</span>
+            <span class="queue-count tabular-nums" id="queueCount">0 ảnh</span>
           </div>
-          <h2 class="dropzone-title">Tải hoặc kéo thả ảnh vào đây</h2>
-          <p class="dropzone-subtitle">Hỗ trợ định dạng JPG, PNG, WebP. Ảnh được xử lý 100% trên máy của bạn, hoàn toàn bảo mật và riêng tư.</p>
-          <div class="dropzone-actions">
-            <button class="btn btn-primary" id="btnUploadTrigger">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="17 8 12 3 7 8"/>
-                <line x1="12" y1="3" x2="12" y2="15"/>
+          <div class="queue-list" id="queueList"></div>
+          <div class="queue-actions">
+            <button class="btn-icon btn-icon-subtle" id="btnQueuePrev" title="Ảnh trước (←)" aria-label="Ảnh trước">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
-              <span>Chọn ảnh từ máy</span>
             </button>
-            <button class="btn btn-secondary" id="btnSampleDocTrigger">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="16" y1="13" x2="8" y2="13"/>
-                <line x1="16" y1="17" x2="8" y2="17"/>
-                <polyline points="10 9 9 9 8 9"/>
+            <button class="btn-icon btn-icon-subtle" id="btnQueueNext" title="Ảnh tiếp (→)" aria-label="Ảnh tiếp">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
-              <span>Thử ảnh mẫu (Tài liệu nghiêng)</span>
+            </button>
+            <button class="btn btn-tonal btn-sm" id="btnQueueAddMore" title="Thêm ảnh vào hàng đợi">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>Thêm</span>
             </button>
           </div>
-          <input type="file" id="mainFileInput" accept="image/*" class="hidden">
         </div>
 
-        <!-- Canvas Stage -->
-        <div class="canvas-stage hidden" id="canvasStage">
-          <canvas id="mainCanvas"></canvas>
-          <div class="crop-overlay hidden" id="cropOverlay"></div>
-          <div class="scanner-overlay hidden" id="scannerOverlay"></div>
+        <div class="canvas-viewport" id="viewport">
+          <!-- Floating HUD -->
+          <div class="viewport-hud" id="hudTag">
+            <span id="hudDimensions" class="tabular-nums">PicStudio Ready</span>
+          </div>
+
+          <!-- Empty State Dropzone -->
+          <div class="dropzone" id="dropzone">
+            <div class="dropzone-icon-badge">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                <circle cx="9" cy="9" r="2"/>
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+              </svg>
+            </div>
+            <h2 class="dropzone-title">Tải hoặc kéo thả ảnh vào đây</h2>
+            <p class="dropzone-subtitle">Hỗ trợ chọn nhiều ảnh cùng lúc để xử lý hàng loạt. Ảnh được xử lý 100% trên máy của bạn, hoàn toàn bảo mật và riêng tư.</p>
+            <div class="dropzone-actions">
+              <button class="btn btn-primary" id="btnUploadTrigger">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <span>Chọn ảnh từ máy (Có thể chọn nhiều)</span>
+              </button>
+              <button class="btn btn-secondary" id="btnSampleDocTrigger">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
+                <span>Thử ảnh mẫu (Tài liệu nghiêng)</span>
+              </button>
+            </div>
+            <input type="file" id="mainFileInput" accept="image/*" multiple class="hidden">
+          </div>
+
+          <!-- Canvas Stage -->
+          <div class="canvas-stage hidden" id="canvasStage">
+            <canvas id="mainCanvas"></canvas>
+            <div class="crop-overlay hidden" id="cropOverlay"></div>
+            <div class="scanner-overlay hidden" id="scannerOverlay"></div>
+          </div>
         </div>
       </div>
 
@@ -294,6 +324,14 @@
             <div>
               <div style="font-weight: 700; font-size: 15px;" id="exportDimLabel" class="tabular-nums">1920 × 1080 px</div>
               <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;" id="exportSizeEst">Ước tính: ~350 KB</div>
+            </div>
+          </div>
+
+          <div id="exportScopeGroup" class="hidden">
+            <label class="form-label" style="display:block; margin-bottom: 6px;">Phạm vi xuất:</label>
+            <div class="chip-group">
+              <button class="chip active" id="btnExportScopeCurrent">Ảnh đang chọn</button>
+              <button class="chip" id="btnExportScopeAll">Tất cả ảnh hàng đợi (<span id="exportAllCount" class="tabular-nums">1</span>)</button>
             </div>
           </div>
 

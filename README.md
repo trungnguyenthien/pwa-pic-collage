@@ -54,6 +54,7 @@
 
 ## 💎 Điểm Khác Biệt & Lợi Ích Vượt Trội
 
+- ⚡ **Hàng đợi xử lý nhiều ảnh (Batch Processing Queue)**: Cho phép chọn cùng lúc nhiều ảnh khi Cắt (Crop) hoặc Đổi kích thước (Resize). Ảnh được nạp vào dải cuộn (filmstrip) trực quan, bạn chỉ việc chọn từng ảnh để chỉnh sửa nối tiếp mà không phải thao tác chọn tệp nhiều lần, sau đó có thể tải về từng ảnh hoặc tải toàn bộ trong 1 lần chạm!
 - 🔒 **Bảo mật & Riêng tư 100%**: Tất cả thao tác xử lý ảnh diễn ra hoàn toàn trên thiết bị của bạn. Không có bất kỳ hình ảnh nào bị tải lên máy chủ bên ngoài.
 - ✈️ **Hoạt động Offline 100%**: Sau lần truy cập đầu tiên, ứng dụng sẵn sàng mở và chỉnh sửa ảnh ngay cả khi bạn ở trên máy bay hoặc mất kết nối mạng.
 - ⚡ **Nhẹ và Cực Nhanh**: Khởi động tức thì, không quảng cáo làm phiền, không cần đăng nhập tài khoản.

@@ -60,6 +60,26 @@ export class CanvasManager {
     return this.hasImage;
   }
 
+  public loadFromCanvas(sourceCanvas: HTMLCanvasElement): void {
+    this.originalWidth = sourceCanvas.width;
+    this.originalHeight = sourceCanvas.height;
+
+    this.canvas.width = this.originalWidth;
+    this.canvas.height = this.originalHeight;
+
+    this.ctx.imageSmoothingEnabled = true;
+    this.ctx.imageSmoothingQuality = 'high';
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.drawImage(sourceCanvas, 0, 0);
+
+    this.hasImage = true;
+    this.history.clear();
+    this.history.pushState(this.ctx, this.canvas.width, this.canvas.height);
+
+    this.fitToViewport();
+    this.notifyImageLoaded(this.originalWidth, this.originalHeight);
+  }
+
   public async loadImage(src: string | File): Promise<void> {
     return new Promise((resolve, reject) => {
       const img = new Image();

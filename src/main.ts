@@ -1,7 +1,8 @@
-import type { ToolTab, ExportOptions, AspectRatioPreset, ScannerOutputPreset, ScannerFilterType } from './types';
+import type { ToolTab, ExportOptions, AspectRatioPreset, ScannerOutputPreset, ScannerFilterType, QueueItem } from './types';
 import { HistoryManager } from './core/HistoryManager';
 import { CanvasManager } from './core/CanvasManager';
 import { ImageExporter } from './core/ImageExporter';
+import { QueueManager } from './core/QueueManager';
 import { CropUI } from './modules/crop/CropUI';
 import { ResizeUI } from './modules/resize/ResizeUI';
 import { ScannerUI } from './modules/scanner/ScannerUI';
@@ -10,6 +11,7 @@ import { CollageUI } from './modules/collage/CollageUI';
 class PicStudioApp {
   private history: HistoryManager;
   private canvasManager: CanvasManager;
+  private queueManager: QueueManager;
 
   private cropUI: CropUI;
   private resizeUI: ResizeUI;
@@ -23,6 +25,7 @@ class PicStudioApp {
   // Export Modal state
   private exportFormat: 'image/webp' | 'image/jpeg' | 'image/png' = 'image/webp';
   private exportQuality: number = 0.9;
+  private exportScope: 'current' | 'all' = 'current';
 
   constructor() {
     this.history = new HistoryManager(10);
@@ -32,6 +35,7 @@ class PicStudioApp {
     const viewportEl = document.getElementById('viewport') as HTMLElement;
 
     this.canvasManager = new CanvasManager(canvas, stageEl, viewportEl, this.history);
+    this.queueManager = new QueueManager();
 
     const cropOverlay = document.getElementById('cropOverlay') as HTMLElement;
     const scannerOverlay = document.getElementById('scannerOverlay') as HTMLElement;
@@ -49,6 +53,7 @@ class PicStudioApp {
   private init(): void {
     this.bindHeaderActions();
     this.bindFileLoading();
+    this.bindQueue();
     this.bindNavigationTabs();
     this.bindCropPanel();
     this.bindScannerPanel();
@@ -68,6 +73,7 @@ class PicStudioApp {
       const canvas = this.canvasManager.getCanvas();
       const ctx = this.canvasManager.getContext();
       if (this.history.undo(ctx, canvas)) {
+        this.queueManager.updateActiveCanvas(canvas);
         this.canvasManager.fitToViewport();
         this.showSnackbar('Đã hoàn tác (Undo)');
       }
@@ -77,6 +83,7 @@ class PicStudioApp {
       const canvas = this.canvasManager.getCanvas();
       const ctx = this.canvasManager.getContext();
       if (this.history.redo(ctx, canvas)) {
+        this.queueManager.updateActiveCanvas(canvas);
         this.canvasManager.fitToViewport();
         this.showSnackbar('Đã làm lại (Redo)');
       }
@@ -90,11 +97,23 @@ class PicStudioApp {
       this.switchTab(this.currentTab);
     });
 
-    // Notify on tool apply
-    this.cropUI.onApply(() => this.showSnackbar('Đã cắt ảnh thành công'));
-    this.resizeUI.onApply(() => this.showSnackbar('Đã đổi kích thước thành công'));
-    this.scannerUI.onApply(() => this.showSnackbar('Đã nắn phẳng tài liệu'));
-    this.collageUI.onApply(() => this.showSnackbar('Đã ghép ảnh thành công'));
+    // Notify on tool apply & sync with queue
+    this.cropUI.onApply(() => {
+      this.queueManager.updateActiveCanvas(this.canvasManager.getCanvas());
+      this.showSnackbar('Đã cắt ảnh thành công');
+    });
+    this.resizeUI.onApply(() => {
+      this.queueManager.updateActiveCanvas(this.canvasManager.getCanvas());
+      this.showSnackbar('Đã đổi kích thước thành công');
+    });
+    this.scannerUI.onApply(() => {
+      this.queueManager.updateActiveCanvas(this.canvasManager.getCanvas());
+      this.showSnackbar('Đã nắn phẳng tài liệu');
+    });
+    this.collageUI.onApply(() => {
+      this.queueManager.updateActiveCanvas(this.canvasManager.getCanvas());
+      this.showSnackbar('Đã ghép ảnh thành công');
+    });
   }
 
   private showWorkspace(): void {
@@ -116,6 +135,14 @@ class PicStudioApp {
     }
   }
 
+  private loadQueueItemToCanvas(item: QueueItem): void {
+    this.canvasManager.loadFromCanvas(item.canvas);
+    this.showWorkspace();
+    const hudDim = document.getElementById('hudDimensions');
+    if (hudDim) hudDim.textContent = `${item.canvas.width} × ${item.canvas.height} px`;
+    this.switchTab(this.currentTab);
+  }
+
   private bindFileLoading(): void {
     const fileInput = document.getElementById('mainFileInput') as HTMLInputElement;
     const btnUpload = document.getElementById('btnUploadTrigger') as HTMLButtonElement;
@@ -124,21 +151,32 @@ class PicStudioApp {
     const viewport = document.getElementById('viewport') as HTMLElement;
 
     btnUpload.onclick = () => fileInput.click();
-    fileInput.onchange = () => {
+    fileInput.onchange = async () => {
       if (fileInput.files && fileInput.files.length > 0) {
-        this.canvasManager.loadImage(fileInput.files[0]);
+        const isFirstLoad = this.queueManager.getItems().length === 0;
+        const count = fileInput.files.length;
+        await this.queueManager.addFiles(fileInput.files);
         fileInput.value = '';
+        if (isFirstLoad) {
+          const active = this.queueManager.getActiveItem();
+          if (active) this.loadQueueItemToCanvas(active);
+        }
+        const total = this.queueManager.getItems().length;
+        this.showSnackbar(`Đã thêm ${count} ảnh vào hàng đợi (${total} ảnh)`);
       }
     };
 
     // Sample document button
     btnSample.onclick = () => {
-      this.canvasManager.loadImage('./samples/skewed-document.jpg')
-        .then(() => {
-          this.switchTab('scanner');
-          this.showSnackbar('Đã tải tài liệu mẫu. Hãy kéo 4 góc và bấm "Nắn Phẳng Ảnh"!');
-        })
-        .catch(() => this.showSnackbar('Không tìm thấy ảnh mẫu.'));
+      const img = new Image();
+      img.src = './samples/skewed-document.jpg';
+      img.onload = async () => {
+        const item = await this.queueManager.addImage(img, 'skewed-document.jpg');
+        this.loadQueueItemToCanvas(item);
+        this.switchTab('scanner');
+        this.showSnackbar('Đã tải tài liệu mẫu. Hãy kéo 4 góc và bấm "Nắn Phẳng Ảnh"!');
+      };
+      img.onerror = () => this.showSnackbar('Không tìm thấy ảnh mẫu.');
     };
 
     // Drag and Drop
@@ -152,16 +190,21 @@ class PicStudioApp {
       e.stopPropagation();
       dropzone.classList.remove('dragover');
     };
-    const handleDrop = (e: DragEvent) => {
+    const handleDrop = async (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
       dropzone.classList.remove('dragover');
 
       if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
-        const file = e.dataTransfer.files[0];
-        if (file.type.startsWith('image/')) {
-          this.canvasManager.loadImage(file);
+        const isFirstLoad = this.queueManager.getItems().length === 0;
+        const count = e.dataTransfer.files.length;
+        await this.queueManager.addFiles(e.dataTransfer.files);
+        if (isFirstLoad) {
+          const active = this.queueManager.getActiveItem();
+          if (active) this.loadQueueItemToCanvas(active);
         }
+        const total = this.queueManager.getItems().length;
+        this.showSnackbar(`Đã thêm ${count} ảnh vào hàng đợi (${total} ảnh)`);
       }
     };
 
@@ -170,18 +213,25 @@ class PicStudioApp {
     viewport.addEventListener('drop', handleDrop);
 
     // Paste from clipboard (Ctrl+V / Cmd+V)
-    window.addEventListener('paste', (e: ClipboardEvent) => {
+    window.addEventListener('paste', async (e: ClipboardEvent) => {
       const items = e.clipboardData?.items;
       if (!items) return;
+      const files: File[] = [];
       for (let i = 0; i < items.length; i++) {
         if (items[i].type.startsWith('image/')) {
           const file = items[i].getAsFile();
-          if (file) {
-            this.canvasManager.loadImage(file);
-            this.showSnackbar('Đã dán ảnh từ clipboard!');
-            break;
-          }
+          if (file) files.push(file);
         }
+      }
+      if (files.length > 0) {
+        const isFirstLoad = this.queueManager.getItems().length === 0;
+        await this.queueManager.addFiles(files);
+        if (isFirstLoad) {
+          const active = this.queueManager.getActiveItem();
+          if (active) this.loadQueueItemToCanvas(active);
+        }
+        const total = this.queueManager.getItems().length;
+        this.showSnackbar(`Đã dán ${files.length} ảnh vào hàng đợi (${total} ảnh)!`);
       }
     });
 
@@ -195,6 +245,111 @@ class PicStudioApp {
         e.preventDefault();
         const btnRedo = document.getElementById('btnRedo') as HTMLButtonElement;
         if (!btnRedo.disabled) btnRedo.click();
+      }
+    });
+  }
+
+  private bindQueue(): void {
+    const queueBar = document.getElementById('queueBar') as HTMLElement;
+    const queueCount = document.getElementById('queueCount') as HTMLElement;
+    const queueList = document.getElementById('queueList') as HTMLElement;
+    const btnQueuePrev = document.getElementById('btnQueuePrev') as HTMLButtonElement;
+    const btnQueueNext = document.getElementById('btnQueueNext') as HTMLButtonElement;
+    const btnQueueAddMore = document.getElementById('btnQueueAddMore') as HTMLButtonElement;
+    const fileInput = document.getElementById('mainFileInput') as HTMLInputElement;
+
+    btnQueueAddMore.onclick = () => fileInput.click();
+
+    btnQueuePrev.onclick = () => {
+      const item = this.queueManager.prev();
+      if (item) this.loadQueueItemToCanvas(item);
+    };
+
+    btnQueueNext.onclick = () => {
+      const item = this.queueManager.next();
+      if (item) this.loadQueueItemToCanvas(item);
+    };
+
+    // Keyboard navigation: [ (prev) and ] (next)
+    window.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === '[' || (e.altKey && e.key === 'ArrowLeft')) {
+        const item = this.queueManager.prev();
+        if (item) this.loadQueueItemToCanvas(item);
+      } else if (e.key === ']' || (e.altKey && e.key === 'ArrowRight')) {
+        const item = this.queueManager.next();
+        if (item) this.loadQueueItemToCanvas(item);
+      }
+    });
+
+    // Queue list click (select / remove)
+    queueList.onclick = (e) => {
+      const target = e.target as HTMLElement;
+      const removeBtn = target.closest('[data-remove-idx]') as HTMLElement;
+      if (removeBtn) {
+        e.stopPropagation();
+        const removeIdx = parseInt(removeBtn.dataset.removeIdx || '-1', 10);
+        if (removeIdx >= 0) {
+          const isActive = removeIdx === this.queueManager.getActiveIndex();
+          this.queueManager.removeItem(removeIdx);
+          if (isActive) {
+            const nextActive = this.queueManager.getActiveItem();
+            if (nextActive) {
+              this.loadQueueItemToCanvas(nextActive);
+            } else {
+              // Queue became empty
+              const dropzone = document.getElementById('dropzone') as HTMLElement;
+              const stage = document.getElementById('canvasStage') as HTMLElement;
+              dropzone.classList.remove('hidden');
+              stage.classList.add('hidden');
+              const hudDim = document.getElementById('hudDimensions');
+              if (hudDim) hudDim.textContent = 'PicStudio Ready';
+            }
+          }
+        }
+        return;
+      }
+
+      const card = target.closest('[data-queue-idx]') as HTMLElement;
+      if (card) {
+        const idx = parseInt(card.dataset.queueIdx || '-1', 10);
+        if (idx >= 0 && idx !== this.queueManager.getActiveIndex()) {
+          const item = this.queueManager.selectItem(idx);
+          if (item) {
+            this.loadQueueItemToCanvas(item);
+          }
+        }
+      }
+    };
+
+    // React to queue changes
+    this.queueManager.onChange((items, activeIndex) => {
+      if (items.length === 0) {
+        queueBar.classList.add('hidden');
+        return;
+      }
+
+      queueBar.classList.remove('hidden');
+      queueCount.textContent = `${activeIndex + 1} / ${items.length} ảnh`;
+      btnQueuePrev.disabled = items.length <= 1;
+      btnQueueNext.disabled = items.length <= 1;
+
+      queueList.innerHTML = items.map((item, idx) => {
+        const isActive = idx === activeIndex;
+        return `
+          <div class="queue-card ${isActive ? 'active' : ''}" data-queue-idx="${idx}" title="${item.name} (${item.canvas.width}×${item.canvas.height})">
+            <img src="${item.thumbnailUrl}" alt="${item.name}" loading="lazy" />
+            <span class="queue-index-badge">${idx + 1}</span>
+            ${item.isModified ? '<span class="queue-status-dot" title="Đã chỉnh sửa"></span>' : ''}
+            <button class="queue-remove-btn" data-remove-idx="${idx}" title="Xoá ảnh này khỏi hàng đợi" aria-label="Xoá">&times;</button>
+          </div>
+        `;
+      }).join('');
+
+      // Scroll active item into view
+      const activeEl = queueList.querySelector(`.queue-card[data-queue-idx="${activeIndex}"]`) as HTMLElement;
+      if (activeEl) {
+        activeEl.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
       }
     });
   }
@@ -335,6 +490,11 @@ class PicStudioApp {
     const previewCanvas = document.getElementById('exportPreviewCanvas') as HTMLCanvasElement;
     const dimLabel = document.getElementById('exportDimLabel') as HTMLElement;
     const sizeEst = document.getElementById('exportSizeEst') as HTMLElement;
+    const exportScopeGroup = document.getElementById('exportScopeGroup') as HTMLElement;
+    const btnScopeCurrent = document.getElementById('btnExportScopeCurrent') as HTMLButtonElement;
+    const btnScopeAll = document.getElementById('btnExportScopeAll') as HTMLButtonElement;
+    const exportAllCount = document.getElementById('exportAllCount') as HTMLElement;
+
     const qualityGroup = document.getElementById('qualitySliderGroup') as HTMLElement;
     const qualitySlider = document.getElementById('exportQualitySlider') as HTMLInputElement;
     const qualityVal = document.getElementById('exportQualityVal') as HTMLElement;
@@ -349,7 +509,13 @@ class PicStudioApp {
       if (this.exportFormat === 'image/jpeg') estBytes = pixels * 0.22 * this.exportQuality;
       if (this.exportFormat === 'image/webp') estBytes = pixels * 0.12 * this.exportQuality;
       if (this.exportFormat === 'image/png') estBytes = pixels * 0.75;
-      sizeEst.textContent = `Ước tính: ~${ImageExporter.formatBytes(estBytes)}`;
+
+      const items = this.queueManager.getItems();
+      if (this.exportScope === 'all' && items.length > 1) {
+        sizeEst.textContent = `Ước tính cả hàng đợi (${items.length} ảnh): ~${ImageExporter.formatBytes(estBytes * items.length)}`;
+      } else {
+        sizeEst.textContent = `Ước tính: ~${ImageExporter.formatBytes(estBytes)}`;
+      }
 
       // Draw thumbnail onto preview canvas
       const srcCanvas = this.canvasManager.getCanvas();
@@ -368,10 +534,22 @@ class PicStudioApp {
     };
 
     btnExportOpen.onclick = () => {
-      if (!this.canvasManager.getHasImage() && this.currentTab !== 'collage') {
+      const items = this.queueManager.getItems();
+      if (!this.canvasManager.getHasImage() && items.length === 0 && this.currentTab !== 'collage') {
         this.showSnackbar('Vui lòng tải ảnh lên trước khi xuất.');
         return;
       }
+
+      if (items.length > 1) {
+        exportScopeGroup.classList.remove('hidden');
+        if (exportAllCount) exportAllCount.textContent = items.length.toString();
+        btnScopeCurrent.classList.toggle('active', this.exportScope === 'current');
+        btnScopeAll.classList.toggle('active', this.exportScope === 'all');
+      } else {
+        exportScopeGroup.classList.add('hidden');
+        this.exportScope = 'current';
+      }
+
       updatePreviewInfo();
       modal.classList.add('open');
     };
@@ -380,6 +558,22 @@ class PicStudioApp {
     modal.onclick = (e) => {
       if (e.target === modal) modal.classList.remove('open');
     };
+
+    // Export Scope selection
+    if (btnScopeCurrent && btnScopeAll) {
+      btnScopeCurrent.onclick = () => {
+        btnScopeCurrent.classList.add('active');
+        btnScopeAll.classList.remove('active');
+        this.exportScope = 'current';
+        updatePreviewInfo();
+      };
+      btnScopeAll.onclick = () => {
+        btnScopeAll.classList.add('active');
+        btnScopeCurrent.classList.remove('active');
+        this.exportScope = 'all';
+        updatePreviewInfo();
+      };
+    }
 
     // Format selection
     modal.querySelectorAll('[data-export-fmt]').forEach((el) => {
@@ -410,18 +604,47 @@ class PicStudioApp {
         format: this.exportFormat,
         quality: this.exportQuality,
       };
-      const canvas = this.canvasManager.getCanvas();
-      try {
-        const { blob } = await ImageExporter.exportCanvas(canvas, opts);
-        const ext = this.exportFormat === 'image/png' ? 'png' : (this.exportFormat === 'image/jpeg' ? 'jpg' : 'webp');
-        const filename = `picstudio_${Date.now()}.${ext}`;
+      const ext = this.exportFormat === 'image/png' ? 'png' : (this.exportFormat === 'image/jpeg' ? 'jpg' : 'webp');
+      const items = this.queueManager.getItems();
 
-        await ImageExporter.downloadOrShare(blob, filename, () => {
+      if (this.exportScope === 'all' && items.length > 1) {
+        btnDownload.disabled = true;
+        const originalText = btnDownload.textContent;
+        btnDownload.textContent = 'Đang xuất hàng loạt...';
+        try {
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const { blob } = await ImageExporter.exportCanvas(item.canvas, opts);
+            const cleanName = item.name.replace(/\.[^/.]+$/, '');
+            const filename = `${cleanName}_picstudio_${i + 1}.${ext}`;
+            await ImageExporter.downloadOrShare(blob, filename);
+            if (i < items.length - 1) {
+              await new Promise(r => setTimeout(r, 200));
+            }
+          }
           modal.classList.remove('open');
-          this.showSnackbar('Đã lưu ảnh về máy!');
-        });
-      } catch (err) {
-        alert('Lỗi khi xuất ảnh: ' + err);
+          this.showSnackbar(`Đã tải về toàn bộ ${items.length} ảnh thành công!`);
+        } catch (err) {
+          alert('Lỗi khi xuất ảnh hàng loạt: ' + err);
+        } finally {
+          btnDownload.disabled = false;
+          btnDownload.textContent = originalText;
+        }
+      } else {
+        const canvas = this.canvasManager.getCanvas();
+        try {
+          const { blob } = await ImageExporter.exportCanvas(canvas, opts);
+          const activeItem = this.queueManager.getActiveItem();
+          const baseName = activeItem ? activeItem.name.replace(/\.[^/.]+$/, '') : `picstudio_${Date.now()}`;
+          const filename = `${baseName}.${ext}`;
+
+          await ImageExporter.downloadOrShare(blob, filename, () => {
+            modal.classList.remove('open');
+            this.showSnackbar('Đã lưu ảnh về máy!');
+          });
+        } catch (err) {
+          alert('Lỗi khi xuất ảnh: ' + err);
+        }
       }
     };
 
@@ -434,8 +657,10 @@ class PicStudioApp {
       const canvas = this.canvasManager.getCanvas();
       try {
         const { blob } = await ImageExporter.exportCanvas(canvas, opts);
+        const activeItem = this.queueManager.getActiveItem();
+        const baseName = activeItem ? activeItem.name.replace(/\.[^/.]+$/, '') : `picstudio_${Date.now()}`;
         const ext = this.exportFormat === 'image/png' ? 'png' : (this.exportFormat === 'image/jpeg' ? 'jpg' : 'webp');
-        const filename = `picstudio_${Date.now()}.${ext}`;
+        const filename = `${baseName}.${ext}`;
 
         await ImageExporter.downloadOrShare(blob, filename, () => {
           modal.classList.remove('open');

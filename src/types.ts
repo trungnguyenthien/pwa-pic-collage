@@ -66,3 +66,12 @@ export interface ExportOptions {
   quality: number; // 0.1 to 1.0
   fileName?: string;
 }
+
+export interface QueueItem {
+  id: string;
+  name: string;
+  canvas: HTMLCanvasElement;
+  thumbnailUrl: string;
+  isModified: boolean;
+}
+
