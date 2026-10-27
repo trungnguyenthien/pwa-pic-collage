@@ -167,8 +167,9 @@
           </div>
 
           <!-- Bottom Navigation Bar: [ - ] fit | [ ↺ ↻ ⧎ ⧯ ⟲ ] | (736x1308) [ + ] (Balanced Studio Bar) -->
+          <!-- Bottom Navigation Bar: [ - ] | [ Fit ↺ ↻ ⧎ ⧯ ⟲ ] | [ + ] (Balanced Studio Bar) -->
           <div class="viewport-nav-bar viewport-nav-bottom hidden" id="viewportBarBottom" aria-label="Thanh công cụ bên dưới ảnh">
-            <!-- Left group: Zoom Out & Fit -->
+            <!-- Left: Zoom Out (-) -->
             <div class="nav-bar-group-left">
               <button class="nav-bar-btn nav-bar-zoom-btn" id="btnViewportZoomOut" title="Thu nhỏ ảnh (-20%)" aria-label="Thu nhỏ ảnh">
                 <div class="nav-bar-btn-tile">
@@ -177,19 +178,19 @@
                   </svg>
                 </div>
               </button>
-              <button class="nav-bar-btn nav-bar-fit-btn" id="btnViewportFit" title="Vừa khít màn hình" aria-label="Vừa khít màn hình">
-                <div class="nav-bar-btn-tile nav-bar-fit-tile">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
-                  </svg>
-                  <span>Fit</span>
-                </div>
-              </button>
             </div>
 
-            <!-- Center group: Image Transform Controls (Rotate, Flip, Reset) -->
+            <!-- Center: 6-button group (Fit, Rotate Left, Rotate Right, Flip H, Flip V, Reset) -->
             <div class="nav-bar-group-center" id="navBarTransformGroup">
               <div class="nav-bar-pill-group">
+                <button class="nav-bar-btn nav-bar-tool-btn nav-bar-fit-btn" id="btnViewportFit" title="Vừa khít màn hình" aria-label="Vừa khít màn hình">
+                  <div class="nav-bar-btn-tile nav-bar-fit-tile">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                    </svg>
+                    <span>Fit</span>
+                  </div>
+                </button>
                 <button class="nav-bar-btn nav-bar-tool-btn" id="btnRotateLeft" title="Xoay trái -90°" aria-label="Xoay trái -90°">
                   <div class="nav-bar-btn-tile">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -241,12 +242,8 @@
               </div>
             </div>
 
-            <!-- Right group: Dimension & Zoom In -->
+            <!-- Right: Zoom In (+) -->
             <div class="nav-bar-group-right">
-              <div class="nav-bar-dimensions-pill" id="viewportDimensionsTag" title="Kích thước ảnh hiện tại">
-                <span class="dim-status-dot" aria-hidden="true"></span>
-                <span id="hudDimensions" class="tabular-nums">(0x0)</span>
-              </div>
               <button class="nav-bar-btn nav-bar-zoom-btn" id="btnViewportZoomIn" title="Phóng to ảnh (+20%)" aria-label="Phóng to ảnh">
                 <div class="nav-bar-btn-tile">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">

@@ -239,8 +239,9 @@
 .nav-bar-group-left {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
+  justify-content: flex-start;
+  min-width: 36px;
+  flex: 0 0 auto;
 }
 
 .nav-bar-group-center {
@@ -254,9 +255,9 @@
 .nav-bar-group-right {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
   justify-content: flex-end;
+  min-width: 36px;
+  flex: 0 0 auto;
 }
 
 .nav-bar-pill-group {
@@ -338,7 +339,7 @@
   border: none;
   color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
-  padding: 4px 2px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -347,12 +348,12 @@
 
 .nav-bar-fit-tile {
   height: 32px;
-  padding: 0 11px;
+  padding: 0 9px;
   width: auto;
-  gap: 5px;
-  font-size: 13px;
+  gap: 4px;
+  font-size: 12.5px;
   font-weight: 700;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
   color: inherit;
 }
 
@@ -1258,6 +1259,7 @@
   }
   .nav-bar-group-left,
   .nav-bar-group-right {
+    min-width: 28px;
     gap: 4px;
   }
   .nav-bar-btn-tile {
