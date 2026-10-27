@@ -137,29 +137,139 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Button-based Crop Controls */
-.crop-action-grid {
+/* 1. VIEWPORT EDGE & CORNER NAVIGATION CONTROLS (Exact Layout from User Diagram) */
+.viewport-canvas-controls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* Let clicks pass through empty canvas areas */
+  z-index: 35;
+}
+
+.viewport-canvas-controls.hidden {
+  display: none !important;
+}
+
+.v-btn {
+  position: absolute;
+  pointer-events: auto;
+  background-color: #000000;
+  color: #ffffff;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
+  transition: transform 0.1s ease, background-color 0.15s ease;
+  z-index: 36;
+}
+.v-btn:hover {
+  background-color: #1e293b;
+}
+.v-btn:active {
+  background-color: var(--brand-purple, #8b5cf6);
+  transform: scale(0.92);
 }
 
-@media (min-width: 640px) {
-  .crop-action-grid {
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-  }
+/* Corner Buttons: Square Black Boxes (Fit, +, -) */
+.v-btn-corner {
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  font-weight: 800;
+  font-size: 15px;
 }
 
-.crop-control-cluster {
+/* Top-Left: Fit */
+.v-btn-tl {
+  top: 8px;
+  left: 8px;
+  letter-spacing: -0.2px;
+}
+
+/* Top-Right: + (Zoom In) */
+.v-btn-tr {
+  top: 8px;
+  right: 8px;
+}
+
+/* Bottom-Right: - (Zoom Out) */
+.v-btn-br {
+  bottom: 8px;
+  right: 8px;
+}
+
+/* Edge Buttons: Semi-Circle / Arched Tabs */
+/* Top-Center: ▲ */
+.v-btn-top {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 58px;
+  height: 32px;
+  border-bottom-left-radius: 32px;
+  border-bottom-right-radius: 32px;
+  padding-bottom: 3px;
+}
+.v-btn-top:active {
+  transform: translateX(-50%) scale(0.92);
+}
+
+/* Bottom-Center: ▼ */
+.v-btn-bottom {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 58px;
+  height: 32px;
+  border-top-left-radius: 32px;
+  border-top-right-radius: 32px;
+  padding-top: 3px;
+}
+.v-btn-bottom:active {
+  transform: translateX(-50%) scale(0.92);
+}
+
+/* Left-Center: ◀ */
+.v-btn-left {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 58px;
+  border-top-right-radius: 32px;
+  border-bottom-right-radius: 32px;
+  padding-right: 3px;
+}
+.v-btn-left:active {
+  transform: translateY(-50%) scale(0.92);
+}
+
+/* Right-Center: ▶ */
+.v-btn-right {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 58px;
+  border-top-left-radius: 32px;
+  border-bottom-left-radius: 32px;
+  padding-left: 3px;
+}
+.v-btn-right:active {
+  transform: translateY(-50%) scale(0.92);
+}
+
+/* Crop Frame Adjustment Bar in Drawer */
+.crop-frame-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   background: var(--bg-hover);
-  padding: 4px 8px;
+  padding: 6px 10px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-base);
 }
@@ -167,7 +277,7 @@
 .cluster-btn-row {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .cluster-label {
@@ -180,16 +290,17 @@
 }
 
 .btn-cluster-action {
-  width: 32px;
   height: 32px;
-  min-width: 32px;
+  padding: 0 10px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   background: var(--bg-surface);
   color: var(--text-main);
   border-radius: var(--radius-sm);
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   transition: all 0.15s ease;
@@ -202,97 +313,12 @@
   box-shadow: var(--shadow-sm);
 }
 .btn-cluster-action:active {
-  transform: scale(0.92);
+  transform: scale(0.94);
   background: var(--brand-purple);
   color: #ffffff;
 }
-
-/* Floating Viewport D-Pad Controller */
-.crop-floating-pad {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 8px;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(10px);
-  border-radius: var(--radius-lg);
-  border: 1.5px solid rgba(139, 92, 246, 0.35);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14), var(--shadow-md);
-  z-index: 35;
-  user-select: none;
-  touch-action: none;
-}
-
-.floating-pad-title {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  color: var(--brand-purple);
-  text-transform: uppercase;
-}
-
-.floating-dpad {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-}
-
-.dpad-middle {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-
-.dpad-btn {
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-surface);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 6px;
-  color: var(--text-main);
-  font-size: 11px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  transition: all 0.1s ease;
-}
-.dpad-btn:hover {
-  border-color: var(--brand-purple);
-  color: var(--brand-purple);
-}
-.dpad-btn:active {
-  background: var(--brand-purple);
-  color: #ffffff;
-  transform: scale(0.9);
-}
-.dpad-center {
-  background: var(--bg-hover);
-  color: var(--brand-purple);
+.btn-cluster-action .btn-text {
   font-size: 12px;
-}
-
-.floating-zoom-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 2px;
-  padding-top: 4px;
-  border-top: 1px solid var(--border-subtle);
-  width: 100%;
-  justify-content: center;
-}
-.dpad-zoom {
-  width: 28px;
-  height: 24px;
-  font-size: 11px;
 }
 
 /* 2. CHIPS & PRESET PILLS */

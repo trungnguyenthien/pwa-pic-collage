@@ -298,6 +298,8 @@ class PicStudioApp {
               const stage = document.getElementById('canvasStage') as HTMLElement;
               dropzone.classList.remove('hidden');
               stage.classList.add('hidden');
+              const vControls = document.getElementById('viewportCanvasControls');
+              if (vControls) vControls.classList.add('hidden');
               const hudDim = document.getElementById('hudDimensions');
               if (hudDim) hudDim.textContent = 'PicStudio Ready';
             }
@@ -393,8 +395,8 @@ class PicStudioApp {
     // 3. Deactivate overlays
     this.cropUI.deactivate();
     this.scannerUI.deactivate();
-    const floatPad = document.getElementById('cropFloatingPad');
-    if (floatPad) floatPad.classList.add('hidden');
+    const viewportControls = document.getElementById('viewportCanvasControls');
+    if (viewportControls) viewportControls.classList.add('hidden');
 
     // 4. Activate selected tool
     switch (tab) {
@@ -403,7 +405,7 @@ class PicStudioApp {
         if (panel) panel.classList.add('active');
         if (this.canvasManager.getHasImage()) {
           this.cropUI.activate();
-          if (floatPad) floatPad.classList.remove('hidden');
+          if (viewportControls) viewportControls.classList.remove('hidden');
         }
         break;
       }
@@ -454,46 +456,51 @@ class PicStudioApp {
     if (btnCropExpand) btnCropExpand.onclick = () => this.cropUI.resizeCropFrame(true, 0.1);
     if (btnCropMax) btnCropMax.onclick = () => this.cropUI.maximizeCropFrame();
 
-    // 2. Image Zoom Buttons (±20%)
-    const btnImgZoomIn = document.getElementById('btnImgZoomIn');
-    const btnImgZoomOut = document.getElementById('btnImgZoomOut');
-    const btnImgZoomFit = document.getElementById('btnImgZoomFit');
+    // Helper for buttons with continuous action when held down
+    const bindRepeat = (btn: HTMLElement | null, action: () => void) => {
+      if (!btn) return;
+      let timer: any = null;
+      let interval: any = null;
 
-    if (btnImgZoomIn) btnImgZoomIn.onclick = () => this.canvasManager.zoomIn(1.2);
-    if (btnImgZoomOut) btnImgZoomOut.onclick = () => this.canvasManager.zoomOut(1.2);
-    if (btnImgZoomFit) btnImgZoomFit.onclick = () => this.canvasManager.fitToViewport();
+      const stop = () => {
+        clearTimeout(timer);
+        clearInterval(interval);
+      };
 
-    // 3. Image Pan Buttons (10% of image size, min 50px)
-    const btnPanLeft = document.getElementById('btnImgPanLeft');
-    const btnPanRight = document.getElementById('btnImgPanRight');
-    const btnPanUp = document.getElementById('btnImgPanUp');
-    const btnPanDown = document.getElementById('btnImgPanDown');
-    const btnPanCenter = document.getElementById('btnImgPanCenter');
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        action();
+        stop();
+        timer = setTimeout(() => {
+          interval = setInterval(action, 100);
+        }, 320);
+      });
 
-    if (btnPanLeft) btnPanLeft.onclick = () => this.canvasManager.panByDirection('left');
-    if (btnPanRight) btnPanRight.onclick = () => this.canvasManager.panByDirection('right');
-    if (btnPanUp) btnPanUp.onclick = () => this.canvasManager.panByDirection('up');
-    if (btnPanDown) btnPanDown.onclick = () => this.canvasManager.panByDirection('down');
-    if (btnPanCenter) btnPanCenter.onclick = () => this.canvasManager.resetPan();
+      btn.addEventListener('pointerup', stop);
+      btn.addEventListener('pointerleave', stop);
+      btn.addEventListener('pointercancel', stop);
+    };
 
-    // 4. Floating On-Screen D-Pad Controller (Viewport)
-    const floatPanLeft = document.getElementById('floatPanLeft');
-    const floatPanRight = document.getElementById('floatPanRight');
-    const floatPanUp = document.getElementById('floatPanUp');
-    const floatPanDown = document.getElementById('floatPanDown');
-    const floatPanCenter = document.getElementById('floatPanCenter');
-    const floatZoomIn = document.getElementById('floatZoomIn');
-    const floatZoomOut = document.getElementById('floatZoomOut');
-    const floatZoomFit = document.getElementById('floatZoomFit');
+    // 2. Viewport Edge & Corner Navigation Controls (Exact User Sketch)
+    // Corner: Fit (Top-Left)
+    const btnVFit = document.getElementById('btnViewportFit');
+    if (btnVFit) btnVFit.onclick = () => this.canvasManager.fitToViewport();
 
-    if (floatPanLeft) floatPanLeft.onclick = () => this.canvasManager.panByDirection('left');
-    if (floatPanRight) floatPanRight.onclick = () => this.canvasManager.panByDirection('right');
-    if (floatPanUp) floatPanUp.onclick = () => this.canvasManager.panByDirection('up');
-    if (floatPanDown) floatPanDown.onclick = () => this.canvasManager.panByDirection('down');
-    if (floatPanCenter) floatPanCenter.onclick = () => this.canvasManager.resetPan();
-    if (floatZoomIn) floatZoomIn.onclick = () => this.canvasManager.zoomIn(1.2);
-    if (floatZoomOut) floatZoomOut.onclick = () => this.canvasManager.zoomOut(1.2);
-    if (floatZoomFit) floatZoomFit.onclick = () => this.canvasManager.fitToViewport();
+    // Corner: Zoom In (+ Top-Right) & Zoom Out (- Bottom-Right)
+    const btnVZoomIn = document.getElementById('btnViewportZoomIn');
+    const btnVZoomOut = document.getElementById('btnViewportZoomOut');
+    bindRepeat(btnVZoomIn, () => this.canvasManager.zoomIn(1.2));
+    bindRepeat(btnVZoomOut, () => this.canvasManager.zoomOut(1.2));
+
+    // Edges: Pan in 4 directions (▲ Top, ▼ Bottom, ◀ Left, ▶ Right)
+    const btnVPanUp = document.getElementById('btnViewportPanUp');
+    const btnVPanDown = document.getElementById('btnViewportPanDown');
+    const btnVPanLeft = document.getElementById('btnViewportPanLeft');
+    const btnVPanRight = document.getElementById('btnViewportPanRight');
+    bindRepeat(btnVPanUp, () => this.canvasManager.panByDirection('up'));
+    bindRepeat(btnVPanDown, () => this.canvasManager.panByDirection('down'));
+    bindRepeat(btnVPanLeft, () => this.canvasManager.panByDirection('left'));
+    bindRepeat(btnVPanRight, () => this.canvasManager.panByDirection('right'));
 
     // Rotate & Flip buttons
     const btnRotL = document.getElementById('btnRotateLeft');

@@ -117,7 +117,7 @@
 .viewport-hud {
   position: absolute;
   top: 14px;
-  left: 14px;
+  left: 60px;
   display: flex;
   align-items: center;
   gap: 8px;
