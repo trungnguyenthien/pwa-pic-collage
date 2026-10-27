@@ -393,6 +393,8 @@ class PicStudioApp {
     // 3. Deactivate overlays
     this.cropUI.deactivate();
     this.scannerUI.deactivate();
+    const floatPad = document.getElementById('cropFloatingPad');
+    if (floatPad) floatPad.classList.add('hidden');
 
     // 4. Activate selected tool
     switch (tab) {
@@ -401,6 +403,7 @@ class PicStudioApp {
         if (panel) panel.classList.add('active');
         if (this.canvasManager.getHasImage()) {
           this.cropUI.activate();
+          if (floatPad) floatPad.classList.remove('hidden');
         }
         break;
       }
@@ -472,6 +475,25 @@ class PicStudioApp {
     if (btnPanUp) btnPanUp.onclick = () => this.canvasManager.panByDirection('up');
     if (btnPanDown) btnPanDown.onclick = () => this.canvasManager.panByDirection('down');
     if (btnPanCenter) btnPanCenter.onclick = () => this.canvasManager.resetPan();
+
+    // 4. Floating On-Screen D-Pad Controller (Viewport)
+    const floatPanLeft = document.getElementById('floatPanLeft');
+    const floatPanRight = document.getElementById('floatPanRight');
+    const floatPanUp = document.getElementById('floatPanUp');
+    const floatPanDown = document.getElementById('floatPanDown');
+    const floatPanCenter = document.getElementById('floatPanCenter');
+    const floatZoomIn = document.getElementById('floatZoomIn');
+    const floatZoomOut = document.getElementById('floatZoomOut');
+    const floatZoomFit = document.getElementById('floatZoomFit');
+
+    if (floatPanLeft) floatPanLeft.onclick = () => this.canvasManager.panByDirection('left');
+    if (floatPanRight) floatPanRight.onclick = () => this.canvasManager.panByDirection('right');
+    if (floatPanUp) floatPanUp.onclick = () => this.canvasManager.panByDirection('up');
+    if (floatPanDown) floatPanDown.onclick = () => this.canvasManager.panByDirection('down');
+    if (floatPanCenter) floatPanCenter.onclick = () => this.canvasManager.resetPan();
+    if (floatZoomIn) floatZoomIn.onclick = () => this.canvasManager.zoomIn(1.2);
+    if (floatZoomOut) floatZoomOut.onclick = () => this.canvasManager.zoomOut(1.2);
+    if (floatZoomFit) floatZoomFit.onclick = () => this.canvasManager.fitToViewport();
 
     // Rotate & Flip buttons
     const btnRotL = document.getElementById('btnRotateLeft');

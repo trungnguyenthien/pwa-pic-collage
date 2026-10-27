@@ -137,29 +137,37 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Button-based Crop Controls Clusters */
-.crop-controls-strip {
+/* Button-based Crop Controls */
+.crop-action-grid {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  overflow-x: auto;
-  padding: 4px 2px;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
 }
-.crop-controls-strip::-webkit-scrollbar {
-  display: none;
+
+@media (min-width: 640px) {
+  .crop-action-grid {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
 }
 
 .crop-control-cluster {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: space-between;
+  gap: 8px;
   background: var(--bg-hover);
-  padding: 4px 6px;
+  padding: 4px 8px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-base);
-  flex-shrink: 0;
+}
+
+.cluster-btn-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .cluster-label {
@@ -168,7 +176,6 @@
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  padding: 0 4px;
   white-space: nowrap;
 }
 
@@ -176,7 +183,7 @@
   width: 32px;
   height: 32px;
   min-width: 32px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   background: var(--bg-surface);
   color: var(--text-main);
   border-radius: var(--radius-sm);
@@ -186,6 +193,7 @@
   cursor: pointer;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   transition: all 0.15s ease;
+  user-select: none;
 }
 .btn-cluster-action:hover {
   background: #ffffff;
@@ -195,6 +203,96 @@
 }
 .btn-cluster-action:active {
   transform: scale(0.92);
+  background: var(--brand-purple);
+  color: #ffffff;
+}
+
+/* Floating Viewport D-Pad Controller */
+.crop-floating-pad {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-lg);
+  border: 1.5px solid rgba(139, 92, 246, 0.35);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14), var(--shadow-md);
+  z-index: 35;
+  user-select: none;
+  touch-action: none;
+}
+
+.floating-pad-title {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--brand-purple);
+  text-transform: uppercase;
+}
+
+.floating-dpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.dpad-middle {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.dpad-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  color: var(--text-main);
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.1s ease;
+}
+.dpad-btn:hover {
+  border-color: var(--brand-purple);
+  color: var(--brand-purple);
+}
+.dpad-btn:active {
+  background: var(--brand-purple);
+  color: #ffffff;
+  transform: scale(0.9);
+}
+.dpad-center {
+  background: var(--bg-hover);
+  color: var(--brand-purple);
+  font-size: 12px;
+}
+
+.floating-zoom-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-subtle);
+  width: 100%;
+  justify-content: center;
+}
+.dpad-zoom {
+  width: 28px;
+  height: 24px;
+  font-size: 11px;
 }
 
 /* 2. CHIPS & PRESET PILLS */
