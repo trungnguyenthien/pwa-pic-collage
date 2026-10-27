@@ -325,22 +325,243 @@
   color: #cbd5e1;
 }
 
-/* Crop Frame Adjustment Bar in Drawer */
-.crop-frame-bar {
+/* Crop Controls Compact Container */
+.crop-controls-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Crop Ratio Selector Row */
+.crop-preset-selector-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 12px;
+}
+
+.crop-ratio-select-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  height: 38px;
+  padding: 0 12px;
   background: var(--bg-hover);
-  padding: 6px 10px;
+  border: 1px solid var(--border-base);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+}
+.crop-ratio-select-btn:hover {
+  background: var(--bg-surface);
+  border-color: var(--brand-purple);
+  box-shadow: var(--shadow-sm);
+}
+.crop-ratio-select-btn:active {
+  transform: scale(0.98);
+}
+
+.crop-ratio-select-preview {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 4px;
+  color: var(--brand-purple);
+  flex-shrink: 0;
+}
+
+.crop-ratio-current-text {
+  flex: 1;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.crop-ratio-chevron {
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+.crop-ratio-select-btn[aria-expanded="true"] .crop-ratio-chevron {
+  transform: rotate(180deg);
+}
+
+/* Crop Frame Size Slider Bar */
+.crop-slider-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg-hover);
+  padding: 8px 12px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-base);
 }
 
-.cluster-btn-row {
+.crop-slider-header {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+}
+
+.crop-slider-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--brand-purple);
+  font-family: var(--font-numeric);
+}
+
+.crop-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider-icon-min,
+.slider-icon-max {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* Crop Ratio Selection Modal & Grid */
+.crop-ratio-dialog-panel {
+  max-width: 460px;
+}
+
+.crop-ratio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.crop-ratio-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-base);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  position: relative;
+  user-select: none;
+  touch-action: manipulation;
+}
+.crop-ratio-card:hover {
+  border-color: var(--brand-purple);
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+.crop-ratio-card.active {
+  border-color: var(--brand-purple);
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.ratio-card-preview-wrap {
+  width: 36px;
+  height: 36px;
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ratio-box-preview {
+  border: 2px solid var(--text-muted);
+  border-radius: 2px;
+  transition: border-color 0.15s ease;
+}
+.crop-ratio-card.active .ratio-box-preview {
+  border-color: var(--brand-purple);
+}
+
+.crop-ratio-preview-box {
+  border: 1.8px solid var(--brand-purple);
+  border-radius: 2px;
+}
+
+.ratio-box-free {
+  width: 18px;
+  height: 16px;
+  border-style: dashed;
+}
+.ratio-box-1-1 {
+  width: 18px;
+  height: 18px;
+}
+.ratio-box-4-3 {
+  width: 20px;
+  height: 15px;
+}
+.ratio-box-3-4 {
+  width: 15px;
+  height: 20px;
+}
+.ratio-box-16-9 {
+  width: 22px;
+  height: 13px;
+}
+.ratio-box-9-16 {
+  width: 13px;
+  height: 22px;
+}
+.ratio-box-2-3 {
+  width: 15px;
+  height: 21px;
+}
+.ratio-box-a4 {
+  width: 14px;
+  height: 20px;
+}
+
+.ratio-card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ratio-card-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.ratio-card-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.ratio-card-check {
+  color: var(--brand-purple);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.crop-ratio-card.active .ratio-card-check {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .cluster-label {
@@ -350,38 +571,6 @@
   text-transform: uppercase;
   letter-spacing: 0.3px;
   white-space: nowrap;
-}
-
-.btn-cluster-action {
-  height: 32px;
-  padding: 0 10px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: var(--bg-surface);
-  color: var(--text-main);
-  border-radius: var(--radius-sm);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  transition: all 0.15s ease;
-  user-select: none;
-}
-.btn-cluster-action:hover {
-  background: #ffffff;
-  color: var(--brand-purple);
-  border-color: rgba(139, 92, 246, 0.3);
-  box-shadow: var(--shadow-sm);
-}
-.btn-cluster-action:active {
-  transform: scale(0.94);
-  background: var(--brand-purple);
-  color: #ffffff;
-}
-.btn-cluster-action .btn-text {
-  font-size: 12px;
 }
 
 /* 2. CHIPS & PRESET PILLS */

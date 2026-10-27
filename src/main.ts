@@ -451,25 +451,91 @@ class PicStudioApp {
   }
 
   private bindCropPanel(): void {
-    // Aspect ratio chips
-    document.querySelectorAll('#panelCrop [data-crop-ratio]').forEach((el) => {
+    // 1. Crop Ratio Selection Modal
+    const cropModal = document.getElementById('cropRatioModal');
+    const btnOpenCropModal = document.getElementById('btnOpenCropRatioModal');
+    const btnCloseCropModal = document.getElementById('btnCloseCropRatioModal');
+    const cropRatioText = document.getElementById('cropCurrentRatioText');
+    const cropRatioBox = document.getElementById('cropCurrentRatioBox');
+
+    const openCropModal = () => {
+      if (cropModal) cropModal.classList.add('open');
+      if (btnOpenCropModal) btnOpenCropModal.setAttribute('aria-expanded', 'true');
+    };
+
+    const closeCropModal = () => {
+      if (cropModal) cropModal.classList.remove('open');
+      if (btnOpenCropModal) btnOpenCropModal.setAttribute('aria-expanded', 'false');
+    };
+
+    if (btnOpenCropModal) btnOpenCropModal.onclick = openCropModal;
+    if (btnCloseCropModal) btnCloseCropModal.onclick = closeCropModal;
+    if (cropModal) {
+      cropModal.addEventListener('click', (e) => {
+        if (e.target === cropModal) closeCropModal();
+      });
+    }
+
+    const ratioLabels: Record<string, string> = {
+      'free': 'Tự do',
+      '1:1': '1 : 1 (Vuông)',
+      '4:3': '4 : 3 (Ngang)',
+      '3:4': '3 : 4 (Dọc)',
+      '16:9': '16 : 9 (Ngang)',
+      '9:16': '9 : 16 (Dọc)',
+      '2:3': '2 : 3 (Khổ in)',
+      'A4': 'A4 (Văn bản)'
+    };
+
+    const ratioBoxClasses: Record<string, string> = {
+      'free': 'ratio-box-free',
+      '1:1': 'ratio-box-1-1',
+      '4:3': 'ratio-box-4-3',
+      '3:4': 'ratio-box-3-4',
+      '16:9': 'ratio-box-16-9',
+      '9:16': 'ratio-box-9-16',
+      '2:3': 'ratio-box-2-3',
+      'A4': 'ratio-box-a4'
+    };
+
+    const selectRatioPreset = (ratio: AspectRatioPreset) => {
+      document.querySelectorAll('#cropRatioGrid [data-crop-ratio]').forEach(c => {
+        const btn = c as HTMLElement;
+        btn.classList.toggle('active', btn.dataset.cropRatio === ratio);
+      });
+      if (cropRatioText) cropRatioText.textContent = ratioLabels[ratio] || ratio;
+      if (cropRatioBox) {
+        cropRatioBox.className = `crop-ratio-preview-box ${ratioBoxClasses[ratio] || 'ratio-box-free'}`;
+      }
+      this.cropUI.setPreset(ratio);
+      closeCropModal();
+    };
+
+    document.querySelectorAll('#cropRatioGrid [data-crop-ratio]').forEach((el) => {
       const btn = el as HTMLButtonElement;
       btn.onclick = () => {
-        document.querySelectorAll('#panelCrop [data-crop-ratio]').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
         const ratio = btn.dataset.cropRatio as AspectRatioPreset;
-        this.cropUI.setPreset(ratio);
+        selectRatioPreset(ratio);
       };
     });
 
-    // 1. Crop Frame Size Buttons
-    const btnCropShrink = document.getElementById('btnCropFrameShrink');
-    const btnCropExpand = document.getElementById('btnCropFrameExpand');
-    const btnCropMax = document.getElementById('btnCropFrameMax');
+    // 2. Crop Frame Size Slider
+    const cropSlider = document.getElementById('cropFrameSizeSlider') as HTMLInputElement | null;
+    const cropSliderVal = document.getElementById('cropFrameSliderVal');
 
-    if (btnCropShrink) btnCropShrink.onclick = () => this.cropUI.resizeCropFrame(false, 0.1);
-    if (btnCropExpand) btnCropExpand.onclick = () => this.cropUI.resizeCropFrame(true, 0.1);
-    if (btnCropMax) btnCropMax.onclick = () => this.cropUI.maximizeCropFrame();
+    if (cropSlider) {
+      cropSlider.oninput = () => {
+        const pct = parseInt(cropSlider.value, 10);
+        if (cropSliderVal) cropSliderVal.textContent = `${pct}%`;
+        this.cropUI.setFrameSizePercent(pct);
+      };
+    }
+
+    // Sync slider when crop box changes (preset change, image load, or reset)
+    this.cropUI.onCropBoxChange((pct) => {
+      if (cropSlider) cropSlider.value = String(pct);
+      if (cropSliderVal) cropSliderVal.textContent = `${pct}%`;
+    });
 
     // Helper for buttons with continuous action when held down
     const bindRepeat = (btn: HTMLElement | null, action: () => void) => {
@@ -496,7 +562,7 @@ class PicStudioApp {
       btn.addEventListener('pointercancel', stop);
     };
 
-    // 2. Viewport Edge & Corner Navigation Controls (Exact User Sketch)
+    // 3. Viewport Edge & Corner Navigation Controls (Exact User Sketch)
     // Corner: Fit (Top-Left)
     const btnVFit = document.getElementById('btnViewportFit');
     if (btnVFit) btnVFit.onclick = () => this.canvasManager.fitToViewport();
@@ -531,9 +597,7 @@ class PicStudioApp {
     if (btnFlipV) btnFlipV.onclick = () => this.cropUI.flip(false, true);
     if (btnResetCrop) {
       btnResetCrop.onclick = () => {
-        document.querySelectorAll('#panelCrop [data-crop-ratio]').forEach(c => c.classList.remove('active'));
-        document.querySelector('#panelCrop [data-crop-ratio="free"]')?.classList.add('active');
-        this.cropUI.setPreset('free');
+        selectRatioPreset('free');
         this.canvasManager.fitToViewport();
       };
     }

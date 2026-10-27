@@ -216,78 +216,36 @@
         <!-- TAB 1: CROP PANEL -->
         <!-- TAB 1: CROP PANEL -->
         <div class="tool-panel active" id="panelCrop">
-          <div class="tool-panel-header">
-            <span class="tool-panel-title">Tỉ lệ cắt:</span>
-          </div>
-          <div class="chip-group">
-            <button class="chip active" data-crop-ratio="free" title="Cắt tự do">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M6 2v14a2 2 0 0 0 2 2h14"/>
-                <path d="M18 22V8a2 2 0 0 0-2-2H2"/>
-              </svg>
-              <span>Tự do</span>
-            </button>
-            <button class="chip" data-crop-ratio="1:1" title="Tỉ lệ 1:1 vuông">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-              </svg>
-              <span>1:1</span>
-            </button>
-            <button class="chip" data-crop-ratio="4:3" title="Tỉ lệ 4:3 ngang">
-              <svg width="15" height="11" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2.2">
-                <rect x="2" y="2" width="20" height="14" rx="2"/>
-              </svg>
-              <span>4:3</span>
-            </button>
-            <button class="chip" data-crop-ratio="3:4" title="Tỉ lệ 3:4 dọc">
-              <svg width="11" height="15" viewBox="0 0 18 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <rect x="2" y="2" width="14" height="20" rx="2"/>
-              </svg>
-              <span>3:4</span>
-            </button>
-            <button class="chip" data-crop-ratio="16:9" title="Tỉ lệ 16:9 ngang">
-              <svg width="16" height="10" viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.2">
-                <rect x="1" y="2" width="22" height="10" rx="2"/>
-              </svg>
-              <span>16:9</span>
-            </button>
-            <button class="chip" data-crop-ratio="9:16" title="Tỉ lệ 9:16 dọc (Story/TikTok)">
-              <svg width="10" height="16" viewBox="0 0 14 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <rect x="2" y="1" width="10" height="22" rx="2"/>
-              </svg>
-              <span>9:16</span>
-            </button>
-            <button class="chip" data-crop-ratio="2:3" title="Tỉ lệ 2:3 ảnh in">
-              <svg width="11" height="15" viewBox="0 0 16 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <rect x="2" y="2" width="12" height="20" rx="2"/>
-              </svg>
-              <span>2:3</span>
-            </button>
-            <button class="chip" data-crop-ratio="A4" title="Khổ giấy A4">
-              <svg width="12" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-              </svg>
-              <span>A4</span>
-            </button>
-          </div>
+          <!-- Ratio Selector Button & Frame Size Slider -->
+          <div class="crop-controls-compact">
+            <div class="crop-preset-selector-row">
+              <span class="cluster-label">Tỉ lệ cắt:</span>
+              <button class="crop-ratio-select-btn" id="btnOpenCropRatioModal" type="button" aria-haspopup="dialog" aria-expanded="false" title="Chọn tỉ lệ cắt ảnh">
+                <div class="crop-ratio-select-preview">
+                  <span class="crop-ratio-preview-box ratio-box-free" id="cropCurrentRatioBox"></span>
+                </div>
+                <span class="crop-ratio-current-text" id="cropCurrentRatioText">Tự do</span>
+                <svg class="crop-ratio-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+            </div>
 
-          <!-- Crop Frame Controls -->
-          <div class="crop-frame-bar">
-            <span class="cluster-label">Khung cắt:</span>
-            <div class="cluster-btn-row">
-              <button class="btn-cluster-action" id="btnCropFrameShrink" title="Thu nhỏ khung cắt" aria-label="Thu nhỏ khung cắt">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                <span class="btn-text">Thu nhỏ</span>
-              </button>
-              <button class="btn-cluster-action" id="btnCropFrameExpand" title="Phóng to khung cắt" aria-label="Phóng to khung cắt">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                <span class="btn-text">Phóng to</span>
-              </button>
-              <button class="btn-cluster-action" id="btnCropFrameMax" title="Khung bao trọn ảnh" aria-label="Khung bao trọn ảnh">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 9v6M3 9v6M21 3l-7 7M3 21l7-7"/></svg>
-                <span class="btn-text">Tối đa</span>
-              </button>
+            <!-- Crop Frame Size Slider -->
+            <div class="crop-slider-bar">
+              <div class="crop-slider-header">
+                <span class="cluster-label">Kích thước khung:</span>
+                <span class="crop-slider-val tabular-nums" id="cropFrameSliderVal">85%</span>
+              </div>
+              <div class="crop-slider-row">
+                <svg class="slider-icon-min" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="7" y="7" width="10" height="10" rx="1.5"/>
+                </svg>
+                <input type="range" class="slider-input" id="cropFrameSizeSlider" min="15" max="100" value="85" step="1" aria-label="Kích thước khung cắt">
+                <svg class="slider-icon-max" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                </svg>
+              </div>
             </div>
           </div>
 
@@ -495,6 +453,128 @@
         <span class="nav-tab-label">Ghép ảnh</span>
       </button>
     </nav>
+
+    <!-- 4.5 CROP RATIO SELECTION MODAL -->
+    <div class="dialog-backdrop" id="cropRatioModal" role="dialog" aria-modal="true" aria-labelledby="cropRatioModalTitle">
+      <div class="dialog-panel crop-ratio-dialog-panel">
+        <div class="dialog-header">
+          <h2 class="dialog-title" id="cropRatioModalTitle">Chọn Tỉ Lệ Khung Cắt</h2>
+          <button class="btn-icon" id="btnCloseCropRatioModal" aria-label="Đóng cửa sổ">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="dialog-body">
+          <div class="crop-ratio-grid" id="cropRatioGrid">
+            <button class="crop-ratio-card active" data-crop-ratio="free" type="button">
+              <div class="ratio-card-preview-wrap">
+                <div class="ratio-box-preview ratio-box-free"></div>
+              </div>
+              <div class="ratio-card-info">
+                <span class="ratio-card-title">Tự do</span>
+                <span class="ratio-card-desc">Tùy biến tự do</span>
+              </div>
+              <div class="ratio-card-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </button>
+
+            <button class="crop-ratio-card" data-crop-ratio="1:1" type="button">
+              <div class="ratio-card-preview-wrap">
+                <div class="ratio-box-preview ratio-box-1-1"></div>
+              </div>
+              <div class="ratio-card-info">
+                <span class="ratio-card-title">1 : 1</span>
+                <span class="ratio-card-desc">Vuông • Avatar / Post</span>
+              </div>
+              <div class="ratio-card-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </button>
+
+            <button class="crop-ratio-card" data-crop-ratio="4:3" type="button">
+              <div class="ratio-card-preview-wrap">
+                <div class="ratio-box-preview ratio-box-4-3"></div>
+              </div>
+              <div class="ratio-card-info">
+                <span class="ratio-card-title">4 : 3</span>
+                <span class="ratio-card-desc">Ngang • Ảnh tiêu chuẩn</span>
+              </div>
+              <div class="ratio-card-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </button>
+
+            <button class="crop-ratio-card" data-crop-ratio="3:4" type="button">
+              <div class="ratio-card-preview-wrap">
+                <div class="ratio-box-preview ratio-box-3-4"></div>
+              </div>
+              <div class="ratio-card-info">
+                <span class="ratio-card-title">3 : 4</span>
+                <span class="ratio-card-desc">Dọc • Ảnh chân dung</span>
+              </div>
+              <div class="ratio-card-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </button>
+
+            <button class="crop-ratio-card" data-crop-ratio="16:9" type="button">
+              <div class="ratio-card-preview-wrap">
+                <div class="ratio-box-preview ratio-box-16-9"></div>
+              </div>
+              <div class="ratio-card-info">
+                <span class="ratio-card-title">16 : 9</span>
+                <span class="ratio-card-desc">Ngang • Video / YouTube</span>
+              </div>
+              <div class="ratio-card-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </button>
+
+            <button class="crop-ratio-card" data-crop-ratio="9:16" type="button">
+              <div class="ratio-card-preview-wrap">
+                <div class="ratio-box-preview ratio-box-9-16"></div>
+              </div>
+              <div class="ratio-card-info">
+                <span class="ratio-card-title">9 : 16</span>
+                <span class="ratio-card-desc">Dọc • Story / TikTok</span>
+              </div>
+              <div class="ratio-card-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </button>
+
+            <button class="crop-ratio-card" data-crop-ratio="2:3" type="button">
+              <div class="ratio-card-preview-wrap">
+                <div class="ratio-box-preview ratio-box-2-3"></div>
+              </div>
+              <div class="ratio-card-info">
+                <span class="ratio-card-title">2 : 3</span>
+                <span class="ratio-card-desc">Dọc • Khổ ảnh in</span>
+              </div>
+              <div class="ratio-card-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </button>
+
+            <button class="crop-ratio-card" data-crop-ratio="A4" type="button">
+              <div class="ratio-card-preview-wrap">
+                <div class="ratio-box-preview ratio-box-a4"></div>
+              </div>
+              <div class="ratio-card-info">
+                <span class="ratio-card-title">A4</span>
+                <span class="ratio-card-desc">Khổ giấy in văn bản</span>
+              </div>
+              <div class="ratio-card-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- 5. EXPORT MODAL -->
     <div class="dialog-backdrop" id="exportModal" role="dialog" aria-modal="true" aria-labelledby="exportModalTitle">

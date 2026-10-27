@@ -31,11 +31,14 @@ export class CropUI {
 
   private isPointerEventsSetup: boolean = false;
 
+  private cropBoxChangeCallbacks: Array<(percent: number) => void> = [];
+
   public activate(): void {
     this.canvasManager.setGesturesEnabled(false);
     this.container.classList.remove('hidden');
     this.render();
     this.resetCropBox();
+    this.notifyCropBoxChange();
   }
 
   public deactivate(): void {
@@ -46,92 +49,110 @@ export class CropUI {
     this.isDraggingBox = false;
   }
 
+  public onCropBoxChange(cb: (percent: number) => void): void {
+    this.cropBoxChangeCallbacks.push(cb);
+  }
+
+  private notifyCropBoxChange(): void {
+    const pct = this.getFrameSizePercent();
+    for (const cb of this.cropBoxChangeCallbacks) {
+      cb(pct);
+    }
+  }
+
   public setPreset(preset: AspectRatioPreset): void {
     this.currentPreset = preset;
     const dims = this.canvasManager.getDimensions();
     this.cropBox = CropEngine.getDefaultCropBox(dims.width, dims.height, preset);
     this.syncDOM();
+    this.notifyCropBoxChange();
+  }
+
+  public getCurrentPreset(): AspectRatioPreset {
+    return this.currentPreset;
   }
 
   /**
-   * Increase or decrease crop frame size by button
+   * Set crop frame size as percentage of the maximum possible box for current preset
+   * @param percent Value between 15 and 100
    */
-  public resizeCropFrame(expand: boolean, percent: number = 0.1): void {
+  public setFrameSizePercent(percent: number): void {
     const dims = this.canvasManager.getDimensions();
+    if (dims.width <= 0 || dims.height <= 0) return;
+
+    const clampedPercent = Math.max(15, Math.min(100, percent));
     const ratio = CropEngine.getAspectRatioValue(this.currentPreset);
 
-    const deltaW = Math.max(30, Math.round(dims.width * percent));
-    let newW = expand ? this.cropBox.width + deltaW : this.cropBox.width - deltaW;
-    let newH = ratio ? newW / ratio : (expand ? this.cropBox.height + Math.max(30, Math.round(dims.height * percent)) : this.cropBox.height - Math.max(30, Math.round(dims.height * percent)));
-
-    const minSize = 50;
-    if (newW < minSize) {
-      newW = minSize;
-      if (ratio) newH = newW / ratio;
-    }
-    if (newH < minSize) {
-      newH = minSize;
-      if (ratio) newW = newH * ratio;
+    let maxW = dims.width;
+    let maxH = dims.height;
+    if (ratio) {
+      maxH = maxW / ratio;
+      if (maxH > dims.height) {
+        maxH = dims.height;
+        maxW = maxH * ratio;
+      }
     }
 
-    if (newW > dims.width) {
-      newW = dims.width;
-      if (ratio) newH = newW / ratio;
-    }
-    if (newH > dims.height) {
-      newH = dims.height;
-      if (ratio) newW = newH * ratio;
-    }
+    const scale = clampedPercent / 100;
+    const newW = Math.max(50, Math.round(maxW * scale));
+    const newH = Math.max(50, ratio ? Math.round(newW / ratio) : Math.round(maxH * scale));
 
-    // Keep crop box centered around current center
     const curCenterX = this.cropBox.x + this.cropBox.width / 2;
     const curCenterY = this.cropBox.y + this.cropBox.height / 2;
 
     let newX = Math.round(curCenterX - newW / 2);
     let newY = Math.round(curCenterY - newH / 2);
 
-    newX = Math.max(0, Math.min(dims.width - Math.round(newW), newX));
-    newY = Math.max(0, Math.min(dims.height - Math.round(newH), newY));
+    newX = Math.max(0, Math.min(dims.width - newW, newX));
+    newY = Math.max(0, Math.min(dims.height - newH, newY));
 
     this.cropBox = {
       x: newX,
       y: newY,
-      width: Math.round(newW),
-      height: Math.round(newH),
+      width: newW,
+      height: newH,
     };
     this.syncDOM();
+    this.notifyCropBoxChange();
+  }
+
+  /**
+   * Get current crop frame size as percentage of maximum possible box
+   */
+  public getFrameSizePercent(): number {
+    const dims = this.canvasManager.getDimensions();
+    if (dims.width <= 0 || dims.height <= 0) return 85;
+
+    const ratio = CropEngine.getAspectRatioValue(this.currentPreset);
+    let maxW = dims.width;
+    let maxH = dims.height;
+    if (ratio) {
+      maxH = maxW / ratio;
+      if (maxH > dims.height) {
+        maxH = dims.height;
+        maxW = maxH * ratio;
+      }
+    }
+
+    if (maxW <= 0) return 85;
+    const pct = Math.round((this.cropBox.width / maxW) * 100);
+    return Math.max(15, Math.min(100, pct));
+  }
+
+  /**
+   * Increase or decrease crop frame size by button (maintained for fallback)
+   */
+  public resizeCropFrame(expand: boolean, percent: number = 0.1): void {
+    const curPct = this.getFrameSizePercent();
+    const targetPct = expand ? curPct + percent * 100 : curPct - percent * 100;
+    this.setFrameSizePercent(targetPct);
   }
 
   /**
    * Reset crop frame to maximum fit within the image
    */
   public maximizeCropFrame(): void {
-    const dims = this.canvasManager.getDimensions();
-    if (dims.width <= 0 || dims.height <= 0) return;
-
-    const ratio = CropEngine.getAspectRatioValue(this.currentPreset);
-    if (!ratio) {
-      this.cropBox = {
-        x: 0,
-        y: 0,
-        width: dims.width,
-        height: dims.height,
-      };
-    } else {
-      let w = dims.width;
-      let h = w / ratio;
-      if (h > dims.height) {
-        h = dims.height;
-        w = h * ratio;
-      }
-      this.cropBox = {
-        x: Math.round((dims.width - w) / 2),
-        y: Math.round((dims.height - h) / 2),
-        width: Math.round(w),
-        height: Math.round(h),
-      };
-    }
-    this.syncDOM();
+    this.setFrameSizePercent(100);
   }
 
   public rotate(angle: number): void {
@@ -165,6 +186,7 @@ export class CropUI {
     const dims = this.canvasManager.getDimensions();
     this.cropBox = CropEngine.getDefaultCropBox(dims.width, dims.height, this.currentPreset);
     this.syncDOM();
+    this.notifyCropBoxChange();
   }
 
   private replaceCanvasContent(newCanvas: HTMLCanvasElement): void {
