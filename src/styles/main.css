@@ -305,6 +305,12 @@
   }
 }
 
+@media (max-width: 859px) {
+  .tool-panel-container:not(:has(.tool-panel.active)) {
+    display: none;
+  }
+}
+
 /* 6. RESPONSIVE DESKTOP LAYOUT (>= 860px) */
 @media (min-width: 860px) {
   .app-main {

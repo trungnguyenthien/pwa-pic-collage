@@ -60,6 +60,14 @@ export class CanvasManager {
     return this.hasImage;
   }
 
+  public clear(): void {
+    this.hasImage = false;
+    this.canvas.width = 0;
+    this.canvas.height = 0;
+    this.ctx.clearRect(0, 0, 0, 0);
+    this.history.clear();
+  }
+
   public syncStageDimensions(width: number, height: number): void {
     if (this.canvas.width !== width) {
       this.canvas.width = width;

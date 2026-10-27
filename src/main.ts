@@ -130,6 +130,9 @@ class PicStudioApp {
       updateDimensionsHUD();
       this.showSnackbar('Đã ghép ảnh thành công');
     });
+
+    // Initial state sync (hide panels/options until an image is loaded)
+    this.switchTab(this.currentTab);
   }
 
   private showWorkspace(): void {
@@ -304,6 +307,7 @@ class PicStudioApp {
               this.loadQueueItemToCanvas(nextActive);
             } else {
               // Queue became empty
+              this.canvasManager.clear();
               const dropzone = document.getElementById('dropzone') as HTMLElement;
               const stage = document.getElementById('canvasStage') as HTMLElement;
               dropzone.classList.remove('hidden');
@@ -312,6 +316,11 @@ class PicStudioApp {
               const vBottom = document.getElementById('viewportBarBottom');
               if (vTop) vTop.classList.add('hidden');
               if (vBottom) vBottom.classList.add('hidden');
+              const panelCrop = document.getElementById('panelCrop');
+              if (panelCrop) panelCrop.classList.remove('active');
+              const cropControls = document.getElementById('cropControlsCompact');
+              if (cropControls) cropControls.classList.add('hidden');
+              this.cropUI.deactivate();
               const hudDim = document.getElementById('hudDimensions');
               if (hudDim) hudDim.textContent = '(0x0)';
             }
@@ -337,6 +346,10 @@ class PicStudioApp {
     this.queueManager.onChange((items, activeIndex) => {
       if (items.length === 0) {
         queueBar.classList.add('hidden');
+        const cropControls = document.getElementById('cropControlsCompact');
+        if (cropControls) cropControls.classList.add('hidden');
+        const panelCrop = document.getElementById('panelCrop');
+        if (panelCrop) panelCrop.classList.remove('active');
         return;
       }
 
@@ -416,27 +429,38 @@ class PicStudioApp {
     switch (tab) {
       case 'crop': {
         const panel = document.getElementById('panelCrop');
-        if (panel) panel.classList.add('active');
+        const cropControls = document.getElementById('cropControlsCompact');
         if (this.canvasManager.getHasImage()) {
+          if (panel) panel.classList.add('active');
+          if (cropControls) cropControls.classList.remove('hidden');
           this.cropUI.activate();
           if (vTop) vTop.classList.remove('hidden');
           if (vBottom) vBottom.classList.remove('hidden');
+        } else {
+          if (panel) panel.classList.remove('active');
+          if (cropControls) cropControls.classList.add('hidden');
+          if (vTop) vTop.classList.add('hidden');
+          if (vBottom) vBottom.classList.add('hidden');
         }
         break;
       }
       case 'resize': {
         const panel = document.getElementById('panelResize');
-        if (panel) panel.classList.add('active');
         if (this.canvasManager.getHasImage()) {
+          if (panel) panel.classList.add('active');
           this.resizeUI.activate();
+        } else {
+          if (panel) panel.classList.remove('active');
         }
         break;
       }
       case 'scanner': {
         const panel = document.getElementById('panelScanner');
-        if (panel) panel.classList.add('active');
         if (this.canvasManager.getHasImage()) {
+          if (panel) panel.classList.add('active');
           this.scannerUI.activate();
+        } else {
+          if (panel) panel.classList.remove('active');
         }
         break;
       }
