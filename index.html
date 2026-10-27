@@ -222,8 +222,8 @@
             <div class="scanner-overlay hidden" id="scannerOverlay"></div>
           </div>
 
-          <!-- Bottom Navigation Bar: [ ◀ ] [ ▼ ] [ ▲ ] [ ▶ ] (Pan Move Bar) -->
-          <div class="viewport-nav-bar viewport-nav-bottom hidden" id="viewportBarBottom" aria-label="Thanh di chuyển ảnh">
+          <!-- Bottom Navigation Bar: [ ◀ ] [ ▼ ] ( ✔ Cắt ảnh ) [ ▲ ] [ ▶ ] (Pan Move & Crop Bar) -->
+          <div class="viewport-nav-bar viewport-nav-bottom hidden" id="viewportBarBottom" aria-label="Thanh di chuyển và cắt ảnh">
             <button class="nav-bar-btn nav-bar-arrow-btn" id="btnViewportPanLeft" title="Di chuyển sang trái" aria-label="Di chuyển sang trái">
               <div class="nav-bar-btn-tile">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -238,6 +238,14 @@
                 </svg>
               </div>
             </button>
+
+            <!-- Center Circular Crop Apply Button (✔) -->
+            <button class="nav-bar-crop-btn" id="btnApplyCropAction" title="Áp dụng cắt ảnh (Crop)" aria-label="Áp dụng cắt ảnh">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </button>
+
             <button class="nav-bar-btn nav-bar-arrow-btn" id="btnViewportPanUp" title="Di chuyển lên trên" aria-label="Di chuyển lên trên">
               <div class="nav-bar-btn-tile">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -302,14 +310,6 @@
             </div>
           </div>
 
-          <div class="crop-action-row">
-            <button class="btn btn-primary btn-block" id="btnApplyCropAction">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-              <span>Áp Dụng Cắt Ảnh</span>
-            </button>
-          </div>
         </div>
 
         <!-- TAB 2: RESIZE PANEL (Injected by ResizeUI) -->
