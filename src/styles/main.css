@@ -65,6 +65,7 @@
 .app-main {
   flex: 1;
   display: flex;
+  flex-direction: column; /* Mobile-first: column layout (workspace on top, controls at bottom) */
   position: relative;
   overflow: hidden;
   background-color: var(--bg-workspace);
@@ -72,6 +73,7 @@
 
 .workspace-area {
   flex: 1;
+  min-height: 0; /* Crucial: allows flex child to shrink properly */
   display: flex;
   flex-direction: column;
   position: relative;
@@ -81,6 +83,7 @@
 
 .canvas-viewport {
   flex: 1;
+  min-height: 0;
   position: relative;
   display: flex;
   align-items: center;
@@ -113,12 +116,12 @@
 /* Floating Zoom Indicator & Helper */
 .viewport-hud {
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: 14px;
+  left: 14px;
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(8px);
   padding: 4px 10px;
   border-radius: var(--radius-full);
@@ -132,22 +135,32 @@
 }
 
 /* 3. CONTEXTUAL TOOL PANELS */
+/* Crucial: Desktop tabs header is STRICTLY HIDDEN on mobile */
+.desktop-tabs-header {
+  display: none;
+}
+
 .tool-panel-container {
   background-color: var(--bg-surface);
   border-top: 1px solid var(--border-base);
   z-index: 40;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
+  width: 100%;
+  max-height: 44vh;
+  box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.04);
   transition: all 0.2s ease;
 }
 
 .tool-panel {
   display: none;
-  padding: 12px 16px;
+  padding: 12px 14px 14px 14px;
   flex-direction: column;
-  gap: 12px;
-  max-height: 220px;
+  gap: 10px;
+  max-height: 40vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .tool-panel.active {
   display: flex;
@@ -160,7 +173,7 @@
   gap: 8px;
 }
 .tool-panel-title {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -171,8 +184,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding-top: 4px;
+  gap: 8px;
+  padding-top: 6px;
+  margin-top: 2px;
+  border-top: 1px solid var(--border-subtle);
 }
 
 /* 4. BOTTOM NAVIGATION DOCK (Mobile & Universal) */
@@ -225,27 +240,93 @@
   font-size: 11px;
 }
 
-/* 5. RESPONSIVE DESKTOP LAYOUT (>= 860px) */
+/* 5. MOBILE COMPACT OPTIMIZATIONS (< 640px) */
+@media (max-width: 640px) {
+  .app-header {
+    padding-left: max(10px, var(--safe-left));
+    padding-right: max(10px, var(--safe-right));
+    height: calc(52px + var(--safe-top));
+  }
+
+  .header-brand {
+    gap: 8px;
+  }
+
+  .brand-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+  }
+
+  .brand-title {
+    font-size: 16px;
+  }
+
+  .header-actions {
+    gap: 4px;
+  }
+
+  #btnUndo, #btnRedo {
+    width: 32px;
+    height: 32px;
+  }
+
+  #btnUpdateApp span,
+  #btnInstall span {
+    display: none; /* Hide label text on mobile, preserve clear SVG icon */
+  }
+
+  #btnUpdateApp,
+  #btnInstall {
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: var(--radius-sm);
+    justify-content: center;
+  }
+
+  #btnExport {
+    padding: 0 10px;
+    height: 32px;
+    font-size: 13px;
+    gap: 4px;
+  }
+
+  .tool-panel .form-row .btn {
+    flex: 1 1 calc(50% - 6px);
+    justify-content: center;
+  }
+}
+
+@media (max-width: 370px) {
+  .brand-title {
+    display: none; /* Icon only on extra narrow devices */
+  }
+}
+
+/* 6. RESPONSIVE DESKTOP LAYOUT (>= 860px) */
 @media (min-width: 860px) {
   .app-main {
     flex-direction: row;
   }
   
   .tool-panel-container {
-    width: 320px;
+    width: 330px;
     border-top: none;
     border-left: 1px solid var(--border-base);
     max-height: none;
+    box-shadow: none;
   }
 
   .tool-panel {
-    max-height: calc(100vh - var(--header-height) - var(--dock-height));
+    max-height: calc(100vh - var(--header-height));
     padding: 20px;
     gap: 16px;
   }
 
   .bottom-nav {
-    display: none; /* On desktop, tabs are visible in the sidebar */
+    display: none; /* On desktop, navigation is in the sidebar */
   }
 
   .desktop-tabs-header {
@@ -263,6 +344,10 @@
     color: var(--text-muted);
     cursor: pointer;
     border-bottom: 2px solid transparent;
+    transition: all 0.15s ease;
+  }
+  .desktop-tab-btn:hover {
+    color: var(--text-main);
   }
   .desktop-tab-btn.active {
     color: var(--brand-purple);

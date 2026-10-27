@@ -108,6 +108,7 @@
 }
 
 .chip {
+  flex-shrink: 0; /* Ensures chips don't shrink inside horizontal scrolling bar */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -139,8 +140,9 @@
 .form-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .form-group {
@@ -301,6 +303,37 @@
   flex-wrap: wrap;
   gap: 12px;
   justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .dropzone {
+    padding: 24px 16px;
+    margin: 12px auto;
+    max-width: calc(100% - 24px);
+  }
+  .dropzone-icon-badge {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    margin-bottom: 14px;
+  }
+  .dropzone-title {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  .dropzone-subtitle {
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .dropzone-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+  .dropzone-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* 6. MODALS & DIALOGS */
@@ -553,4 +586,27 @@
   align-items: center;
   gap: 6px;
 }
+
+@media (max-width: 640px) {
+  .queue-bar {
+    height: 56px;
+    padding: 0 8px;
+    gap: 8px;
+  }
+  .queue-header-tag {
+    min-width: 55px;
+  }
+  .queue-title {
+    font-size: 9px;
+  }
+  .queue-count {
+    font-size: 11px;
+  }
+  .queue-card {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+  }
+}
+
 

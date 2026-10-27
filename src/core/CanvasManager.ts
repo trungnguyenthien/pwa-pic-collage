@@ -194,6 +194,26 @@ export class CanvasManager {
         }
       }
     }, { passive: false });
+
+    // Auto-refit on container resize (orientation change, window resize)
+    if (typeof ResizeObserver !== 'undefined') {
+      let resizeTimer: any = null;
+      const ro = new ResizeObserver(() => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (this.hasImage) {
+            this.fitToViewport();
+          }
+        }, 100);
+      });
+      ro.observe(this.viewportEl);
+    } else {
+      window.addEventListener('resize', () => {
+        if (this.hasImage) {
+          this.fitToViewport();
+        }
+      });
+    }
   }
 
   public onImageLoaded(cb: (w: number, h: number) => void): void {
