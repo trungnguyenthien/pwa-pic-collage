@@ -257,26 +257,10 @@ class PicStudioApp {
 
   private bindQueue(): void {
     const queueBar = document.getElementById('queueBar') as HTMLElement;
-    const queueCount = document.getElementById('queueCount') as HTMLElement;
     const queueList = document.getElementById('queueList') as HTMLElement;
-    const btnQueuePrev = document.getElementById('btnQueuePrev') as HTMLButtonElement;
-    const btnQueueNext = document.getElementById('btnQueueNext') as HTMLButtonElement;
-    const btnQueueAddMore = document.getElementById('btnQueueAddMore') as HTMLButtonElement;
     const fileInput = document.getElementById('mainFileInput') as HTMLInputElement;
 
-    btnQueueAddMore.onclick = () => fileInput.click();
-
-    btnQueuePrev.onclick = () => {
-      const item = this.queueManager.prev();
-      if (item) this.loadQueueItemToCanvas(item);
-    };
-
-    btnQueueNext.onclick = () => {
-      const item = this.queueManager.next();
-      if (item) this.loadQueueItemToCanvas(item);
-    };
-
-    // Keyboard navigation: [ (prev) and ] (next)
+    // Keyboard navigation: [ (prev) and ] (next) or Alt+Arrows
     window.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       if (e.key === '[' || (e.altKey && e.key === 'ArrowLeft')) {
@@ -288,9 +272,18 @@ class PicStudioApp {
       }
     });
 
-    // Queue list click (select / remove)
+    // Queue slider interaction: select / remove / add
     queueList.onclick = (e) => {
       const target = e.target as HTMLElement;
+
+      // Click Add Photo (+) card
+      const addBtn = target.closest('#btnQueueAddMore');
+      if (addBtn) {
+        fileInput.click();
+        return;
+      }
+
+      // Click Remove button (×)
       const removeBtn = target.closest('[data-remove-idx]') as HTMLElement;
       if (removeBtn) {
         e.stopPropagation();
@@ -316,6 +309,7 @@ class PicStudioApp {
         return;
       }
 
+      // Click Photo card to select
       const card = target.closest('[data-queue-idx]') as HTMLElement;
       if (card) {
         const idx = parseInt(card.dataset.queueIdx || '-1', 10);
@@ -336,24 +330,33 @@ class PicStudioApp {
       }
 
       queueBar.classList.remove('hidden');
-      queueCount.textContent = `${activeIndex + 1} / ${items.length} ảnh`;
-      btnQueuePrev.disabled = items.length <= 1;
-      btnQueueNext.disabled = items.length <= 1;
 
-      queueList.innerHTML = items.map((item, idx) => {
+      const cardsHtml = items.map((item, idx) => {
         const isActive = idx === activeIndex;
         return `
-          <div class="queue-card ${isActive ? 'active' : ''}" data-queue-idx="${idx}" title="${item.name} (${item.canvas.width}×${item.canvas.height})">
+          <div class="queue-slide-card ${isActive ? 'active' : ''}" data-queue-idx="${idx}" title="${item.name} (${item.canvas.width}×${item.canvas.height})">
             <img src="${item.thumbnailUrl}" alt="${item.name}" loading="lazy" />
             <span class="queue-index-badge">${idx + 1}</span>
             ${item.isModified ? '<span class="queue-status-dot" title="Đã chỉnh sửa"></span>' : ''}
-            <button class="queue-remove-btn" data-remove-idx="${idx}" title="Xoá ảnh này khỏi hàng đợi" aria-label="Xoá">&times;</button>
+            <button class="queue-remove-btn" data-remove-idx="${idx}" title="Xoá ảnh này" aria-label="Xoá">&times;</button>
           </div>
         `;
       }).join('');
 
-      // Scroll active item into view
-      const activeEl = queueList.querySelector(`.queue-card[data-queue-idx="${activeIndex}"]`) as HTMLElement;
+      // Minimalist Add (+) card at the end of the slide
+      const addCardHtml = `
+        <button class="queue-slide-add-card" id="btnQueueAddMore" title="Thêm ảnh vào hàng đợi" aria-label="Thêm ảnh">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      `;
+
+      queueList.innerHTML = cardsHtml + addCardHtml;
+
+      // Scroll active item into view smoothly
+      const activeEl = queueList.querySelector(`.queue-slide-card[data-queue-idx="${activeIndex}"]`) as HTMLElement;
       if (activeEl) {
         activeEl.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
       }

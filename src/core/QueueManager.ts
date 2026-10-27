@@ -131,30 +131,23 @@ export class QueueManager {
 
   private generateThumbnail(sourceCanvas: HTMLCanvasElement): string {
     const thumbCanvas = document.createElement('canvas');
-    const size = 100;
+    const size = 180;
     thumbCanvas.width = size;
     thumbCanvas.height = size;
     const ctx = thumbCanvas.getContext('2d');
     if (!ctx) return '';
 
-    const ratio = sourceCanvas.width / sourceCanvas.height;
-    let dw = size;
-    let dh = size;
-    let dx = 0;
-    let dy = 0;
+    // Center-crop (cover) so photo fills the slide card without letterboxing
+    const scale = Math.max(size / sourceCanvas.width, size / sourceCanvas.height);
+    const sw = size / scale;
+    const sh = size / scale;
+    const sx = (sourceCanvas.width - sw) / 2;
+    const sy = (sourceCanvas.height - sh) / 2;
 
-    if (ratio > 1) {
-      dh = size / ratio;
-      dy = (size - dh) / 2;
-    } else {
-      dw = size * ratio;
-      dx = (size - dw) / 2;
-    }
-
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, size, size);
-    ctx.drawImage(sourceCanvas, dx, dy, dw, dh);
-    return thumbCanvas.toDataURL('image/jpeg', 0.8);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(sourceCanvas, sx, sy, sw, sh, 0, 0, size, size);
+    return thumbCanvas.toDataURL('image/jpeg', 0.85);
   }
 
   private loadFile(file: File): Promise<void> {

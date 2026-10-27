@@ -87,32 +87,9 @@
     <!-- 2. MAIN WORKSPACE VIEWPORT -->
     <main class="app-main" id="mainArea">
       <div class="workspace-area">
-        <!-- Queue Bar for Batch Image Processing -->
-        <div class="queue-bar hidden" id="queueBar">
-          <div class="queue-header-tag">
-            <span class="queue-title">Hàng đợi:</span>
-            <span class="queue-count tabular-nums" id="queueCount">0 ảnh</span>
-          </div>
-          <div class="queue-list" id="queueList"></div>
-          <div class="queue-actions">
-            <button class="btn-icon btn-icon-subtle" id="btnQueuePrev" title="Ảnh trước (←)" aria-label="Ảnh trước">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <polyline points="15 18 9 12 15 6"></polyline>
-              </svg>
-            </button>
-            <button class="btn-icon btn-icon-subtle" id="btnQueueNext" title="Ảnh tiếp (→)" aria-label="Ảnh tiếp">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </button>
-            <button class="btn btn-tonal btn-sm" id="btnQueueAddMore" title="Thêm ảnh vào hàng đợi">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              <span>Thêm</span>
-            </button>
-          </div>
+        <!-- Photo Queue Slider (Clean Filmstrip) -->
+        <div class="queue-slider-bar hidden" id="queueBar">
+          <div class="queue-slider-track" id="queueList"></div>
         </div>
 
         <div class="canvas-viewport" id="viewport">
