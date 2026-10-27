@@ -129,9 +129,11 @@ export class CanvasManager {
     if (!this.hasImage || this.canvas.width === 0 || this.canvas.height === 0) return;
 
     const viewportRect = this.viewportEl.getBoundingClientRect();
-    const padding = 16;
-    const availW = Math.max(100, (viewportRect.width || window.innerWidth) - padding * 2);
-    const availH = Math.max(100, (viewportRect.height || window.innerHeight) - padding * 2);
+    const paddingX = 16;
+    const barHeight = 46;
+    const paddingY = barHeight + 8;
+    const availW = Math.max(100, (viewportRect.width || window.innerWidth) - paddingX * 2);
+    const availH = Math.max(100, (viewportRect.height || window.innerHeight) - paddingY * 2);
 
     const scaleW = availW / this.canvas.width;
     const scaleH = availH / this.canvas.height;

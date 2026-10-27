@@ -96,28 +96,38 @@ class PicStudioApp {
     };
 
     // Update HUD dimensions on image load
+    const updateDimensionsHUD = () => {
+      const dims = this.canvasManager.getDimensions();
+      const hudDim = document.getElementById('hudDimensions');
+      if (hudDim) hudDim.textContent = `(${dims.width}x${dims.height})`;
+    };
+
     this.canvasManager.onImageLoaded((w, h) => {
       this.showWorkspace();
       const hudDim = document.getElementById('hudDimensions');
-      if (hudDim) hudDim.textContent = `${w} × ${h} px`;
+      if (hudDim) hudDim.textContent = `(${w}x${h})`;
       this.switchTab(this.currentTab);
     });
 
     // Notify on tool apply & sync with queue
     this.cropUI.onApply(() => {
       this.queueManager.updateActiveCanvas(this.canvasManager.getCanvas());
+      updateDimensionsHUD();
       this.showSnackbar('Đã cắt ảnh thành công');
     });
     this.resizeUI.onApply(() => {
       this.queueManager.updateActiveCanvas(this.canvasManager.getCanvas());
+      updateDimensionsHUD();
       this.showSnackbar('Đã đổi kích thước thành công');
     });
     this.scannerUI.onApply(() => {
       this.queueManager.updateActiveCanvas(this.canvasManager.getCanvas());
+      updateDimensionsHUD();
       this.showSnackbar('Đã nắn phẳng tài liệu');
     });
     this.collageUI.onApply(() => {
       this.queueManager.updateActiveCanvas(this.canvasManager.getCanvas());
+      updateDimensionsHUD();
       this.showSnackbar('Đã ghép ảnh thành công');
     });
   }
@@ -298,10 +308,12 @@ class PicStudioApp {
               const stage = document.getElementById('canvasStage') as HTMLElement;
               dropzone.classList.remove('hidden');
               stage.classList.add('hidden');
-              const vControls = document.getElementById('viewportCanvasControls');
-              if (vControls) vControls.classList.add('hidden');
+              const vTop = document.getElementById('viewportBarTop');
+              const vBottom = document.getElementById('viewportBarBottom');
+              if (vTop) vTop.classList.add('hidden');
+              if (vBottom) vBottom.classList.add('hidden');
               const hudDim = document.getElementById('hudDimensions');
-              if (hudDim) hudDim.textContent = 'PicStudio Ready';
+              if (hudDim) hudDim.textContent = '(0x0)';
             }
           }
         }
@@ -395,8 +407,10 @@ class PicStudioApp {
     // 3. Deactivate overlays
     this.cropUI.deactivate();
     this.scannerUI.deactivate();
-    const viewportControls = document.getElementById('viewportCanvasControls');
-    if (viewportControls) viewportControls.classList.add('hidden');
+    const vTop = document.getElementById('viewportBarTop');
+    const vBottom = document.getElementById('viewportBarBottom');
+    if (vTop) vTop.classList.add('hidden');
+    if (vBottom) vBottom.classList.add('hidden');
 
     // 4. Activate selected tool
     switch (tab) {
@@ -405,7 +419,8 @@ class PicStudioApp {
         if (panel) panel.classList.add('active');
         if (this.canvasManager.getHasImage()) {
           this.cropUI.activate();
-          if (viewportControls) viewportControls.classList.remove('hidden');
+          if (vTop) vTop.classList.remove('hidden');
+          if (vBottom) vBottom.classList.remove('hidden');
         }
         break;
       }

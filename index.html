@@ -93,9 +93,28 @@
         </div>
 
         <div class="canvas-viewport" id="viewport">
-          <!-- Floating HUD -->
-          <div class="viewport-hud" id="hudTag">
-            <span id="hudDimensions" class="tabular-nums">PicStudio Ready</span>
+          <!-- Top Navigation Bar: [ ◀ ] [ ▼ ] [ ▲ ] [ ▶ ] (Exact User Sketch) -->
+          <div class="viewport-nav-bar viewport-nav-top hidden" id="viewportBarTop" aria-label="Thanh di chuyển ảnh">
+            <button class="nav-bar-btn nav-bar-arrow-btn" id="btnViewportPanLeft" title="Di chuyển sang trái" aria-label="Di chuyển sang trái">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5,12 19,4 19,20"/>
+              </svg>
+            </button>
+            <button class="nav-bar-btn nav-bar-arrow-btn" id="btnViewportPanDown" title="Di chuyển xuống dưới" aria-label="Di chuyển xuống dưới">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="12,19 4,5 20,5"/>
+              </svg>
+            </button>
+            <button class="nav-bar-btn nav-bar-arrow-btn" id="btnViewportPanUp" title="Di chuyển lên trên" aria-label="Di chuyển lên trên">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="12,5 4,19 20,19"/>
+              </svg>
+            </button>
+            <button class="nav-bar-btn nav-bar-arrow-btn" id="btnViewportPanRight" title="Di chuyển sang phải" aria-label="Di chuyển sang phải">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="19,12 5,4 5,20"/>
+              </svg>
+            </button>
           </div>
 
           <!-- Empty State Dropzone -->
@@ -139,55 +158,29 @@
             <div class="scanner-overlay hidden" id="scannerOverlay"></div>
           </div>
 
-          <!-- Viewport Edge & Corner Navigation Controls (Exact User Sketch) -->
-          <div class="viewport-canvas-controls hidden" id="viewportCanvasControls" aria-label="Điều khiển di chuyển và zoom ảnh">
-            <!-- Top-Left: Fit Button -->
-            <button class="v-btn v-btn-corner v-btn-tl" id="btnViewportFit" title="Vừa khít màn hình (Fit)" aria-label="Vừa khít màn hình">
-              <span>Fit</span>
-            </button>
-
-            <!-- Top-Center: Pan Up (▲) -->
-            <button class="v-btn v-btn-edge v-btn-top" id="btnViewportPanUp" title="Di chuyển ảnh lên trên" aria-label="Di chuyển ảnh lên trên">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="12,5 4,19 20,19"/>
-              </svg>
-            </button>
-
-            <!-- Top-Right: Zoom In (+) -->
-            <button class="v-btn v-btn-corner v-btn-tr" id="btnViewportZoomIn" title="Phóng to ảnh (+20%)" aria-label="Phóng to ảnh">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round">
-                <line x1="12" y1="5" x2="12" y2="19"/>
-                <line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-            </button>
-
-            <!-- Left-Center: Pan Left (◀) -->
-            <button class="v-btn v-btn-edge v-btn-left" id="btnViewportPanLeft" title="Di chuyển ảnh sang trái" aria-label="Di chuyển ảnh sang trái">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="5,12 19,4 19,20"/>
-              </svg>
-            </button>
-
-            <!-- Right-Center: Pan Right (▶) -->
-            <button class="v-btn v-btn-edge v-btn-right" id="btnViewportPanRight" title="Di chuyển ảnh sang phải" aria-label="Di chuyển ảnh sang phải">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="19,12 5,4 5,20"/>
-              </svg>
-            </button>
-
-            <!-- Bottom-Center: Pan Down (▼) -->
-            <button class="v-btn v-btn-edge v-btn-bottom" id="btnViewportPanDown" title="Di chuyển ảnh xuống dưới" aria-label="Di chuyển ảnh xuống dưới">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="12,19 4,5 20,5"/>
-              </svg>
-            </button>
-
-            <!-- Bottom-Right: Zoom Out (-) -->
-            <button class="v-btn v-btn-corner v-btn-br" id="btnViewportZoomOut" title="Thu nhỏ ảnh (-20%)" aria-label="Thu nhỏ ảnh">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-            </button>
+          <!-- Bottom Navigation Bar: [ - ] fit (736x1308) [ + ] (Exact User Sketch) -->
+          <div class="viewport-nav-bar viewport-nav-bottom hidden" id="viewportBarBottom" aria-label="Thanh zoom và kích thước ảnh">
+            <div class="nav-bar-group-left">
+              <button class="nav-bar-btn nav-bar-zoom-btn" id="btnViewportZoomOut" title="Thu nhỏ ảnh (-20%)" aria-label="Thu nhỏ ảnh">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+              </button>
+              <button class="nav-bar-btn nav-bar-fit-btn" id="btnViewportFit" title="Vừa khít màn hình" aria-label="Vừa khít màn hình">
+                <span>fit</span>
+              </button>
+            </div>
+            <div class="nav-bar-group-right">
+              <div class="nav-bar-dimensions" id="viewportDimensionsTag">
+                <span id="hudDimensions" class="tabular-nums">(0x0)</span>
+              </div>
+              <button class="nav-bar-btn nav-bar-zoom-btn" id="btnViewportZoomIn" title="Phóng to ảnh (+20%)" aria-label="Phóng to ảnh">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
