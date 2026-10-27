@@ -178,19 +178,19 @@
 
 .viewport-nav-top {
   top: 0;
-  justify-content: space-around;
-  padding: 0 4px;
+  justify-content: space-between;
+  padding: 0 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .viewport-nav-bottom {
   bottom: 0;
-  justify-content: space-between;
-  padding: 0 10px;
+  justify-content: space-around;
+  padding: 0 4px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Arrow buttons in top bar */
+/* Arrow buttons in bottom bar */
 .nav-bar-arrow-btn {
   flex: 1;
   height: 100%;
