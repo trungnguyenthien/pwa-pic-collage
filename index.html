@@ -93,27 +93,35 @@
         </div>
 
         <div class="canvas-viewport" id="viewport">
-          <!-- Top Navigation Bar: [ ◀ ] [ ▼ ] [ ▲ ] [ ▶ ] (Exact User Sketch) -->
+          <!-- Top Navigation Bar: [ ◀ ] [ ▼ ] [ ▲ ] [ ▶ ] (Refined Pro Studio Bar) -->
           <div class="viewport-nav-bar viewport-nav-top hidden" id="viewportBarTop" aria-label="Thanh di chuyển ảnh">
             <button class="nav-bar-btn nav-bar-arrow-btn" id="btnViewportPanLeft" title="Di chuyển sang trái" aria-label="Di chuyển sang trái">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="5,12 19,4 19,20"/>
-              </svg>
+              <div class="nav-bar-btn-tile">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8.2 10.9c-.8.5-.8 1.7 0 2.2l7.6 4.7c.8.5 1.8-.1 1.8-1.1V7.3c0-1-1-1.6-1.8-1.1L8.2 10.9z"/>
+                </svg>
+              </div>
             </button>
             <button class="nav-bar-btn nav-bar-arrow-btn" id="btnViewportPanDown" title="Di chuyển xuống dưới" aria-label="Di chuyển xuống dưới">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="12,19 4,5 20,5"/>
-              </svg>
+              <div class="nav-bar-btn-tile">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M10.9 15.8c.5.8 1.7.8 2.2 0l4.7-7.6c.5-.8-.1-1.8-1.1-1.8H7.3c-1 0-1.6 1-1.1 1.8l4.7 7.6z"/>
+                </svg>
+              </div>
             </button>
             <button class="nav-bar-btn nav-bar-arrow-btn" id="btnViewportPanUp" title="Di chuyển lên trên" aria-label="Di chuyển lên trên">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="12,5 4,19 20,19"/>
-              </svg>
+              <div class="nav-bar-btn-tile">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M13.1 8.2c-.5-.8-1.7-.8-2.2 0L6.2 15.8c-.5.8.1 1.8 1.1 1.8h9.4c1 0 1.6-1 1.1-1.8L13.1 8.2z"/>
+                </svg>
+              </div>
             </button>
             <button class="nav-bar-btn nav-bar-arrow-btn" id="btnViewportPanRight" title="Di chuyển sang phải" aria-label="Di chuyển sang phải">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="19,12 5,4 5,20"/>
-              </svg>
+              <div class="nav-bar-btn-tile">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M15.8 13.1c.8-.5.8-1.7 0-2.2L8.2 6.2c-.8-.5-1.8.1-1.8 1.1v9.4c0 1 1 1.6 1.8 1.1l7.6-4.7z"/>
+                </svg>
+              </div>
             </button>
           </div>
 
@@ -158,27 +166,37 @@
             <div class="scanner-overlay hidden" id="scannerOverlay"></div>
           </div>
 
-          <!-- Bottom Navigation Bar: [ - ] fit (736x1308) [ + ] (Exact User Sketch) -->
+          <!-- Bottom Navigation Bar: [ - ] fit (736x1308) [ + ] (Refined Pro Studio Bar) -->
           <div class="viewport-nav-bar viewport-nav-bottom hidden" id="viewportBarBottom" aria-label="Thanh zoom và kích thước ảnh">
             <div class="nav-bar-group-left">
               <button class="nav-bar-btn nav-bar-zoom-btn" id="btnViewportZoomOut" title="Thu nhỏ ảnh (-20%)" aria-label="Thu nhỏ ảnh">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
+                <div class="nav-bar-btn-tile">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                </div>
               </button>
               <button class="nav-bar-btn nav-bar-fit-btn" id="btnViewportFit" title="Vừa khít màn hình" aria-label="Vừa khít màn hình">
-                <span>fit</span>
+                <div class="nav-bar-btn-tile nav-bar-fit-tile">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                  </svg>
+                  <span>Fit</span>
+                </div>
               </button>
             </div>
             <div class="nav-bar-group-right">
-              <div class="nav-bar-dimensions" id="viewportDimensionsTag">
+              <div class="nav-bar-dimensions-pill" id="viewportDimensionsTag" title="Kích thước ảnh hiện tại">
+                <span class="dim-status-dot" aria-hidden="true"></span>
                 <span id="hudDimensions" class="tabular-nums">(0x0)</span>
               </div>
               <button class="nav-bar-btn nav-bar-zoom-btn" id="btnViewportZoomIn" title="Phóng to ảnh (+20%)" aria-label="Phóng to ảnh">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
-                  <line x1="12" y1="5" x2="12" y2="19"/>
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
+                <div class="nav-bar-btn-tile">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                </div>
               </button>
             </div>
           </div>

@@ -137,17 +137,19 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* 1. VIEWPORT NAVIGATION BARS (Top Move Bar & Bottom Zoom/Dimension Bar - Exact User Sketch) */
+/* 1. VIEWPORT NAVIGATION BARS (Top Move Bar & Bottom Zoom/Dimension Bar - Refined Pro Studio) */
 .viewport-nav-bar {
   position: absolute;
   left: 0;
   right: 0;
-  height: 48px;
-  background-color: #000000;
+  height: 46px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   z-index: 35;
   display: flex;
   align-items: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
@@ -160,14 +162,15 @@
 .viewport-nav-top {
   top: 0;
   justify-content: space-around;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .viewport-nav-bottom {
   bottom: 0;
   justify-content: space-between;
-  padding: 0 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Arrow buttons in top bar */
@@ -176,85 +179,150 @@
   height: 100%;
   background: transparent;
   border: none;
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.1s ease;
+  padding: 4px;
   touch-action: manipulation;
 }
-.nav-bar-arrow-btn:hover {
-  background-color: rgba(255, 255, 255, 0.12);
-}
-.nav-bar-arrow-btn:active {
-  background-color: rgba(255, 255, 255, 0.25);
-  transform: scale(0.9);
+
+/* Common interactive tile for bar buttons */
+.nav-bar-btn-tile {
+  width: 44px;
+  height: 32px;
+  border-radius: var(--radius-sm, 8px);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
-/* Bottom bar groups & items: green theme (#86efac) */
+.nav-bar-arrow-btn:hover .nav-bar-btn-tile {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.nav-bar-arrow-btn:active .nav-bar-btn-tile {
+  background: rgba(139, 92, 246, 0.4);
+  border-color: var(--brand-purple, #8b5cf6);
+  color: #ffffff;
+  transform: scale(0.92);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+}
+
+/* Bottom bar groups & items */
 .nav-bar-group-left,
 .nav-bar-group-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 }
 
 .nav-bar-zoom-btn {
-  width: 44px;
-  height: 44px;
   background: transparent;
   border: none;
-  color: #86efac;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  padding: 4px 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: background-color 0.15s ease, transform 0.1s ease, color 0.15s ease;
   touch-action: manipulation;
 }
-.nav-bar-zoom-btn:hover {
-  background-color: rgba(134, 239, 172, 0.15);
-  color: #bbf7d0;
+
+.nav-bar-zoom-btn .nav-bar-btn-tile {
+  width: 34px;
+  height: 32px;
 }
-.nav-bar-zoom-btn:active {
-  background-color: rgba(134, 239, 172, 0.3);
-  transform: scale(0.9);
+
+.nav-bar-zoom-btn:hover .nav-bar-btn-tile {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.nav-bar-zoom-btn:active .nav-bar-btn-tile {
+  background: rgba(139, 92, 246, 0.4);
+  border-color: var(--brand-purple, #8b5cf6);
+  color: #ffffff;
+  transform: scale(0.92);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
 }
 
 .nav-bar-fit-btn {
   background: transparent;
   border: none;
-  color: #86efac;
-  font-size: 18px;
-  font-weight: 700;
-  font-family: inherit;
+  color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: background-color 0.15s ease, transform 0.1s ease, color 0.15s ease;
-  touch-action: manipulation;
-  letter-spacing: -0.2px;
-}
-.nav-bar-fit-btn:hover {
-  background-color: rgba(134, 239, 172, 0.15);
-  color: #bbf7d0;
-}
-.nav-bar-fit-btn:active {
-  background-color: rgba(134, 239, 172, 0.3);
-  transform: scale(0.92);
-}
-
-.nav-bar-dimensions {
-  color: #86efac;
-  font-size: 15px;
-  font-weight: 600;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  letter-spacing: 0.2px;
+  padding: 4px 2px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+}
+
+.nav-bar-fit-tile {
+  height: 32px;
+  padding: 0 11px;
+  width: auto;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: inherit;
+}
+
+.nav-bar-fit-btn:hover .nav-bar-fit-tile {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.nav-bar-fit-btn:active .nav-bar-fit-tile {
+  background: var(--brand-purple, #8b5cf6);
+  border-color: var(--brand-purple, #8b5cf6);
+  color: #ffffff;
+  transform: scale(0.92);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
+}
+
+/* Dimensions Pill Badge */
+.nav-bar-dimensions-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: var(--font-numeric, monospace);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
   user-select: none;
+}
+
+.dim-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--brand-cyan, #06b6d4);
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.8);
+}
+
+.nav-bar-dimensions-pill .tabular-nums {
+  color: #cbd5e1;
 }
 
 /* Crop Frame Adjustment Bar in Drawer */
