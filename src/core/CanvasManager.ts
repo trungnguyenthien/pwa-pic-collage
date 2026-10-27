@@ -60,12 +60,20 @@ export class CanvasManager {
     return this.hasImage;
   }
 
+  public syncStageDimensions(width: number, height: number): void {
+    this.canvas.width = width;
+    this.canvas.height = height;
+    this.canvas.style.width = `${width}px`;
+    this.canvas.style.height = `${height}px`;
+    this.stageEl.style.width = `${width}px`;
+    this.stageEl.style.height = `${height}px`;
+  }
+
   public loadFromCanvas(sourceCanvas: HTMLCanvasElement): void {
     this.originalWidth = sourceCanvas.width;
     this.originalHeight = sourceCanvas.height;
 
-    this.canvas.width = this.originalWidth;
-    this.canvas.height = this.originalHeight;
+    this.syncStageDimensions(this.originalWidth, this.originalHeight);
 
     this.ctx.imageSmoothingEnabled = true;
     this.ctx.imageSmoothingQuality = 'high';
@@ -88,8 +96,7 @@ export class CanvasManager {
         this.originalWidth = img.naturalWidth;
         this.originalHeight = img.naturalHeight;
 
-        this.canvas.width = this.originalWidth;
-        this.canvas.height = this.originalHeight;
+        this.syncStageDimensions(this.originalWidth, this.originalHeight);
 
         this.ctx.imageSmoothingEnabled = true;
         this.ctx.imageSmoothingQuality = 'high';
@@ -117,14 +124,17 @@ export class CanvasManager {
   public fitToViewport(): void {
     if (!this.hasImage || this.canvas.width === 0 || this.canvas.height === 0) return;
 
+    this.syncStageDimensions(this.canvas.width, this.canvas.height);
+
     const viewportRect = this.viewportEl.getBoundingClientRect();
-    const padding = 32;
-    const availW = Math.max(100, viewportRect.width - padding * 2);
-    const availH = Math.max(100, viewportRect.height - padding * 2);
+    const padding = 16;
+    const availW = Math.max(100, (viewportRect.width || window.innerWidth) - padding * 2);
+    const availH = Math.max(100, (viewportRect.height || window.innerHeight) - padding * 2);
 
     const scaleW = availW / this.canvas.width;
     const scaleH = availH / this.canvas.height;
-    this.scale = Math.min(1, Math.min(scaleW, scaleH));
+    // Always fit frame immediately: scale up or down to maximize available display area
+    this.scale = Math.min(scaleW, scaleH);
 
     this.panX = 0;
     this.panY = 0;

@@ -24,21 +24,20 @@ export class CropEngine {
   ): Rect {
     const ratio = this.getAspectRatioValue(preset);
     if (!ratio) {
-      // Freeform: 90% centered box
-      const marginX = imgWidth * 0.05;
-      const marginY = imgHeight * 0.05;
+      // Freeform: fits 100% of the image frame immediately
       return {
-        x: Math.round(marginX),
-        y: Math.round(marginY),
-        width: Math.round(imgWidth * 0.9),
-        height: Math.round(imgHeight * 0.9),
+        x: 0,
+        y: 0,
+        width: imgWidth,
+        height: imgHeight,
       };
     }
 
-    let w = imgWidth * 0.85;
+    // Aspect ratio presets: maximize fit within image bounds without arbitrary margins
+    let w = imgWidth;
     let h = w / ratio;
-    if (h > imgHeight * 0.85) {
-      h = imgHeight * 0.85;
+    if (h > imgHeight) {
+      h = imgHeight;
       w = h * ratio;
     }
 

@@ -30,16 +30,20 @@ export class CropUI {
     });
   }
 
+  private isPointerEventsSetup: boolean = false;
+
   public activate(): void {
     this.container.classList.remove('hidden');
-    this.resetCropBox();
     this.render();
+    this.resetCropBox();
   }
 
   public deactivate(): void {
     this.container.classList.add('hidden');
     this.container.innerHTML = '';
     this.cropBoxEl = null;
+    this.activeHandle = null;
+    this.isDraggingBox = false;
   }
 
   public setPreset(preset: AspectRatioPreset): void {
@@ -86,8 +90,7 @@ export class CropUI {
     const canvas = this.canvasManager.getCanvas();
     const ctx = this.canvasManager.getContext();
 
-    canvas.width = newCanvas.width;
-    canvas.height = newCanvas.height;
+    this.canvasManager.syncStageDimensions(newCanvas.width, newCanvas.height);
 
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
@@ -138,7 +141,8 @@ export class CropUI {
   }
 
   private setupPointerEvents(): void {
-    if (!this.cropBoxEl) return;
+    if (this.isPointerEventsSetup) return;
+    this.isPointerEventsSetup = true;
 
     // Handle drag on handles or body
     this.container.addEventListener('pointerdown', (e) => {

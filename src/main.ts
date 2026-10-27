@@ -142,8 +142,8 @@ class PicStudioApp {
   }
 
   private loadQueueItemToCanvas(item: QueueItem): void {
-    this.canvasManager.loadFromCanvas(item.canvas);
     this.showWorkspace();
+    this.canvasManager.loadFromCanvas(item.canvas);
     const hudDim = document.getElementById('hudDimensions');
     if (hudDim) hudDim.textContent = `${item.canvas.width} × ${item.canvas.height} px`;
     this.switchTab(this.currentTab);
@@ -455,7 +455,13 @@ class PicStudioApp {
     if (btnRotL) btnRotL.onclick = () => this.cropUI.rotate(-90);
     if (btnRotR) btnRotR.onclick = () => this.cropUI.rotate(90);
     if (btnFlipH) btnFlipH.onclick = () => this.cropUI.flip(true, false);
-    if (btnResetCrop) btnResetCrop.onclick = () => this.cropUI.setPreset('free');
+    if (btnResetCrop) {
+      btnResetCrop.onclick = () => {
+        document.querySelectorAll('#panelCrop [data-crop-ratio]').forEach(c => c.classList.remove('active'));
+        document.querySelector('#panelCrop [data-crop-ratio="free"]')?.classList.add('active');
+        this.cropUI.setPreset('free');
+      };
+    }
     if (btnApplyCrop) btnApplyCrop.onclick = () => this.cropUI.applyCrop();
   }
 

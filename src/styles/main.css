@@ -94,7 +94,9 @@
 
 .canvas-stage {
   position: relative;
-  display: inline-block;
+  display: block;
+  flex-shrink: 0;
+  transform-origin: center center;
   box-shadow: var(--shadow-md);
   border-radius: 4px;
   background-image: 
@@ -109,8 +111,6 @@
 
 #mainCanvas {
   display: block;
-  max-width: 100%;
-  max-height: 100%;
 }
 
 /* Floating Zoom Indicator & Helper */

@@ -39,10 +39,12 @@ export class ScannerUI {
     });
   }
 
+  private isPointerEventsSetup: boolean = false;
+
   public activate(): void {
     this.container.classList.remove('hidden');
-    this.resetQuad();
     this.render();
+    this.resetQuad();
   }
 
   public deactivate(): void {
@@ -102,8 +104,7 @@ export class ScannerUI {
     const canvas = this.canvasManager.getCanvas();
     const ctx = this.canvasManager.getContext();
 
-    canvas.width = warped.width;
-    canvas.height = warped.height;
+    this.canvasManager.syncStageDimensions(warped.width, warped.height);
 
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
@@ -167,6 +168,9 @@ export class ScannerUI {
   }
 
   private setupPointerEvents(): void {
+    if (this.isPointerEventsSetup) return;
+    this.isPointerEventsSetup = true;
+
     const onPointerDown = (e: PointerEvent) => {
       const target = e.target as HTMLElement;
       const pinKey = target.closest('.scanner-pin')?.getAttribute('data-pin') as keyof Quadrilateral | null;
