@@ -8,6 +8,12 @@ import { ResizeUI } from './modules/resize/ResizeUI';
 import { ScannerUI } from './modules/scanner/ScannerUI';
 import { CollageUI } from './modules/collage/CollageUI';
 
+// Vite CSS imports for reliable HMR and bundling
+import './styles/variables.css';
+import './styles/components.css';
+import './styles/overlays.css';
+import './styles/main.css';
+
 class PicStudioApp {
   private history: HistoryManager;
   private canvasManager: CanvasManager;
@@ -764,6 +770,17 @@ class PicStudioApp {
       };
     }
 
+    // Clean legacy picstudio-v1 caches if present
+    if ('caches' in window) {
+      caches.keys().then((keys) => {
+        keys.forEach((key) => {
+          if (key === 'picstudio-v1') {
+            caches.delete(key);
+          }
+        });
+      });
+    }
+
     // 3. Register Service Worker with relative scope
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -771,6 +788,8 @@ class PicStudioApp {
           .register('./sw.js', { scope: './' })
           .then((reg) => {
             this.swRegistration = reg;
+            // Immediate check for update
+            reg.update();
 
             // Detect new worker in background
             reg.addEventListener('updatefound', () => {
