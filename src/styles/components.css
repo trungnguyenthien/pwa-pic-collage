@@ -433,20 +433,31 @@
 
 /* Crop Ratio Selection Modal & Grid */
 .crop-ratio-dialog-panel {
-  max-width: 460px;
+  max-width: 440px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.crop-ratio-dialog-panel .dialog-body {
+  padding: 16px 14px;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .crop-ratio-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .crop-ratio-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
+  gap: 8px;
+  padding: 8px 10px;
   background: var(--bg-surface);
   border: 1.5px solid var(--border-base);
   border-radius: var(--radius-md);
@@ -456,6 +467,10 @@
   position: relative;
   user-select: none;
   touch-action: manipulation;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .crop-ratio-card:hover {
   border-color: var(--brand-purple);
@@ -469,8 +484,8 @@
 }
 
 .ratio-card-preview-wrap {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   background: var(--bg-hover);
   border-radius: var(--radius-sm);
   display: flex;
@@ -494,37 +509,37 @@
 }
 
 .ratio-box-free {
-  width: 18px;
-  height: 16px;
+  width: 16px;
+  height: 15px;
   border-style: dashed;
 }
 .ratio-box-1-1 {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 .ratio-box-4-3 {
-  width: 20px;
-  height: 15px;
+  width: 18px;
+  height: 14px;
 }
 .ratio-box-3-4 {
-  width: 15px;
-  height: 20px;
+  width: 14px;
+  height: 18px;
 }
 .ratio-box-16-9 {
-  width: 22px;
-  height: 13px;
+  width: 20px;
+  height: 12px;
 }
 .ratio-box-9-16 {
-  width: 13px;
-  height: 22px;
+  width: 12px;
+  height: 20px;
 }
 .ratio-box-2-3 {
-  width: 15px;
-  height: 21px;
+  width: 14px;
+  height: 19px;
 }
 .ratio-box-a4 {
-  width: 14px;
-  height: 20px;
+  width: 13px;
+  height: 18px;
 }
 
 .ratio-card-info {
@@ -532,32 +547,43 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  padding-right: 14px;
 }
 
 .ratio-card-title {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.25;
 }
 
 .ratio-card-desc {
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: 1px;
+  line-height: 1.25;
 }
 
 .ratio-card-check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
   color: var(--brand-purple);
   opacity: 0;
   transform: scale(0.6);
   transition: all 0.15s ease;
-  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
 }
 .crop-ratio-card.active .ratio-card-check {
   opacity: 1;
@@ -844,6 +870,7 @@
   width: 100%;
   max-width: 480px;
   max-height: 90vh;
+  box-sizing: border-box;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -1091,7 +1118,7 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Mobile responsive slider */
+/* Mobile responsive slider & modal */
 @media (max-width: 640px) {
   .queue-slider-bar {
     height: 84px;
@@ -1109,6 +1136,44 @@
   }
   .queue-remove-btn {
     opacity: 0.85; /* Accessible on touch devices */
+  }
+
+  /* Crop Ratio Modal on Mobile */
+  .dialog-backdrop {
+    padding: 12px;
+  }
+  .crop-ratio-dialog-panel {
+    max-width: 100%;
+  }
+  .crop-ratio-dialog-panel .dialog-header {
+    padding: 14px 16px;
+  }
+  .crop-ratio-dialog-panel .dialog-body {
+    padding: 12px 10px;
+  }
+  .crop-ratio-grid {
+    gap: 6px;
+  }
+  .crop-ratio-card {
+    padding: 8px 6px;
+    gap: 6px;
+  }
+  .ratio-card-preview-wrap {
+    width: 30px;
+    height: 30px;
+  }
+  .ratio-card-info {
+    padding-right: 12px;
+  }
+  .ratio-card-title {
+    font-size: 12.5px;
+  }
+  .ratio-card-desc {
+    font-size: 10px;
+  }
+  .ratio-card-check {
+    top: 5px;
+    right: 5px;
   }
 }
 
