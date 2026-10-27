@@ -1,0 +1,99 @@
+/* PicStudio Light Theme Design System Tokens */
+:root {
+  /* Color Palette (Clean Nordic Light Studio) */
+  --bg-app: #ffffff;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: rgba(255, 255, 255, 0.92);
+  --bg-workspace: #f8fafc;
+  --bg-checkerboard: #f1f5f9;
+  --bg-hover: #f1f5f9;
+  --bg-active: #e2e8f0;
+
+  /* Typography Colors */
+  --text-main: #0f172a;        /* Deep Slate (WCAG AA Contrast > 14:1) */
+  --text-muted: #64748b;       /* Muted Slate (WCAG AA Contrast > 4.5:1) */
+  --text-light: #94a3b8;
+  --text-inverse: #ffffff;
+
+  /* Brand Colors & Gradient (Cyan & Purple) */
+  --brand-cyan: #06b6d4;
+  --brand-purple: #8b5cf6;
+  --brand-gradient: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+  --brand-gradient-hover: linear-gradient(135deg, #0891b2 0%, #7c3aed 100%);
+  --brand-gradient-soft: linear-gradient(135deg, rgba(6, 182, 212, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%);
+  --brand-glow: 0 4px 20px rgba(139, 92, 246, 0.25);
+
+  /* Status & Accents */
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --overlay-scrim: rgba(15, 23, 42, 0.45);
+
+  /* Borders & Dividers */
+  --border-subtle: #f1f5f9;
+  --border-base: #e2e8f0;
+  --border-focus: #8b5cf6;
+  --border-pin: #06b6d4;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-dock: 0 -4px 16px rgba(15, 23, 42, 0.06);
+
+  /* Safe Area Insets (iOS Safari & Android Edge-to-Edge) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* Layout Measurements */
+  --header-height: 56px;
+  --dock-height: 64px;
+  --touch-target: 48px;
+  --touch-target-sm: 40px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Typography & Numeric alignment */
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-numeric: 'Inter', -apple-system, BlinkMacSystemFont, monospace;
+}
+
+/* Global Reset & Base Rules */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* MANDATORY RULE FROM PWA-STANDARDS: Disable Browser Pull-To-Refresh */
+html, body {
+  overscroll-behavior-y: none;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Force Tabular Numbers for all numerical labels, dimensions, and stats */
+.tabular-nums, .dim-label, .percent-val, .file-size-tag {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Smooth Focus states for accessibility */
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}

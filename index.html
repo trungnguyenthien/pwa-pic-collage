@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>PicStudio - Chỉnh Sửa & Ghép Ảnh Tiện Lợi (PWA)</title>
+  <meta name="description" content="Công cụ PWA chỉnh sửa ảnh, crop theo tỉ lệ chuẩn, resize giữ tỉ lệ, căn phẳng tài liệu 4 góc và ghép ảnh lưới. 100% bảo mật offline." />
+  <meta name="theme-color" content="#ffffff" />
+
+  <!-- iOS Safari Compatibility (Compliant with pwa-standards) -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <!-- BẮT BUỘC content="default" cho Light Theme nền trắng, tránh dải gradient scrim xám đen lem luốc ở đỉnh màn hình iOS -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="PicStudio" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+
+  <!-- Manifest & Favicons -->
+  <link rel="manifest" href="./manifest.webmanifest?v=1" />
+  <link rel="icon" type="image/png" sizes="64x64" href="./favicon.png" />
+  <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="./src/styles/variables.css?v=1" />
+  <link rel="stylesheet" href="./src/styles/components.css?v=1" />
+  <link rel="stylesheet" href="./src/styles/overlays.css?v=1" />
+  <link rel="stylesheet" href="./src/styles/main.css?v=1" />
+</head>
+<body>
+  <div class="app-container" id="app">
+    <!-- 1. TOP APP BAR -->
+    <header class="app-header" role="banner">
+      <div class="header-brand" id="brandHome" title="Về trang chủ">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="3" rx="4"/>
+            <path d="M3 9h18M9 21V9"/>
+          </svg>
+        </div>
+        <span class="brand-title">PicStudio</span>
+      </div>
+
+      <!-- History controls -->
+      <div class="header-actions">
+        <button id="btnUndo" class="btn-icon" aria-label="Hoàn tác (Ctrl+Z)" title="Hoàn tác (Undo)" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7v6h6M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
+          </svg>
+        </button>
+        <button id="btnRedo" class="btn-icon" aria-label="Làm lại (Ctrl+Y)" title="Làm lại (Redo)" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 7v6h-6M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/>
+          </svg>
+        </button>
+
+        <!-- PWA Force Update Button (Compliant with pwa-standards) -->
+        <button id="btnUpdateApp" class="btn btn-secondary btn-sm" aria-label="Kiểm tra cập nhật ứng dụng" title="Cập nhật ứng dụng">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+            <path d="M16 21h5v-5"/>
+          </svg>
+          <span id="updateAppText">Cập nhật</span>
+        </button>
+
+        <!-- PWA Install Button (Hidden by default, shown via JS) -->
+        <button id="btnInstall" class="btn btn-tonal btn-sm hidden" aria-label="Cài đặt ứng dụng">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>Cài đặt</span>
+        </button>
+
+        <!-- Export Button -->
+        <button id="btnExport" class="btn btn-primary btn-sm" aria-label="Xuất và tải ảnh về">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>Xuất ảnh</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. MAIN WORKSPACE VIEWPORT -->
+    <main class="app-main" id="mainArea">
+      <div class="canvas-viewport" id="viewport">
+        <!-- Floating HUD -->
+        <div class="viewport-hud" id="hudTag">
+          <span id="hudDimensions" class="tabular-nums">PicStudio Ready</span>
+        </div>
+
+        <!-- Empty State Dropzone -->
+        <div class="dropzone" id="dropzone">
+          <div class="dropzone-icon-badge">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+              <circle cx="9" cy="9" r="2"/>
+              <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+            </svg>
+          </div>
+          <h2 class="dropzone-title">Tải hoặc kéo thả ảnh vào đây</h2>
+          <p class="dropzone-subtitle">Hỗ trợ định dạng JPG, PNG, WebP. Ảnh được xử lý 100% trên máy của bạn, hoàn toàn bảo mật và riêng tư.</p>
+          <div class="dropzone-actions">
+            <button class="btn btn-primary" id="btnUploadTrigger">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <span>Chọn ảnh từ máy</span>
+            </button>
+            <button class="btn btn-secondary" id="btnSampleDocTrigger">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              <span>Thử ảnh mẫu (Tài liệu nghiêng)</span>
+            </button>
+          </div>
+          <input type="file" id="mainFileInput" accept="image/*" class="hidden">
+        </div>
+
+        <!-- Canvas Stage -->
+        <div class="canvas-stage hidden" id="canvasStage">
+          <canvas id="mainCanvas"></canvas>
+          <div class="crop-overlay hidden" id="cropOverlay"></div>
+          <div class="scanner-overlay hidden" id="scannerOverlay"></div>
+        </div>
+      </div>
+
+      <!-- 3. CONTEXTUAL TOOL PANELS DOCK -->
+      <aside class="tool-panel-container" id="toolPanelContainer">
+        <!-- Desktop Header Tabs -->
+        <div class="desktop-tabs-header">
+          <button class="desktop-tab-btn active" data-tab="crop">Cắt ảnh</button>
+          <button class="desktop-tab-btn" data-tab="resize">Đổi cỡ</button>
+          <button class="desktop-tab-btn" data-tab="scanner">Căn 4 góc</button>
+          <button class="desktop-tab-btn" data-tab="collage">Ghép ảnh</button>
+        </div>
+
+        <!-- TAB 1: CROP PANEL -->
+        <div class="tool-panel active" id="panelCrop">
+          <div class="tool-panel-header">
+            <span class="tool-panel-title">Tỉ lệ cắt chuẩn:</span>
+          </div>
+          <div class="chip-group">
+            <button class="chip active" data-crop-ratio="free">Tự do</button>
+            <button class="chip" data-crop-ratio="1:1">1:1 Vuông</button>
+            <button class="chip" data-crop-ratio="4:3">4:3</button>
+            <button class="chip" data-crop-ratio="3:4">3:4 Dọc</button>
+            <button class="chip" data-crop-ratio="16:9">16:9</button>
+            <button class="chip" data-crop-ratio="9:16">9:16 Story</button>
+            <button class="chip" data-crop-ratio="2:3">2:3 In ảnh</button>
+            <button class="chip" data-crop-ratio="A4">Khổ A4</button>
+          </div>
+          <div class="form-row" style="margin-top: 4px;">
+            <button class="btn btn-secondary btn-sm" id="btnRotateLeft" title="Xoay trái 90°">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+              </svg>
+              <span>Xoay -90°</span>
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btnRotateRight" title="Xoay phải 90°">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                <path d="M21 3v5h-5"/>
+              </svg>
+              <span>Xoay +90°</span>
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btnFlipH" title="Lật ngang">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h3M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3M12 2v20"/>
+              </svg>
+              <span>Lật ngang</span>
+            </button>
+          </div>
+          <div class="tool-action-bar">
+            <button class="btn btn-secondary btn-sm" id="btnResetCrop">Đặt lại</button>
+            <button class="btn btn-primary btn-sm" id="btnApplyCropAction">Áp Dụng Cắt</button>
+          </div>
+        </div>
+
+        <!-- TAB 2: RESIZE PANEL (Injected by ResizeUI) -->
+        <div class="tool-panel" id="panelResize"></div>
+
+        <!-- TAB 3: SCANNER PANEL -->
+        <div class="tool-panel" id="panelScanner">
+          <div class="tool-panel-header">
+            <span class="tool-panel-title">Khổ nắn thẳng:</span>
+            <span style="font-size: 11px; color: var(--text-muted);">Kéo 4 điểm góc</span>
+          </div>
+          <div class="chip-group">
+            <button class="chip active" data-scanner-preset="auto">Tự động đo</button>
+            <button class="chip" data-scanner-preset="a4-portrait">Khổ A4 Dọc</button>
+            <button class="chip" data-scanner-preset="a4-landscape">Khổ A4 Ngang</button>
+            <button class="chip" data-scanner-preset="id-card">Thẻ / CCCD</button>
+            <button class="chip" data-scanner-preset="receipt">Hóa đơn dài</button>
+            <button class="chip" data-scanner-preset="source">Khung ảnh gốc</button>
+          </div>
+
+          <div>
+            <label class="form-label" style="display:block; margin-bottom: 6px;">Bộ lọc tài liệu:</label>
+            <div class="chip-group">
+              <button class="chip active" data-scanner-filter="original">Màu gốc</button>
+              <button class="chip" data-scanner-filter="magic-scan">Magic Scan (Trắng giấy)</button>
+              <button class="chip" data-scanner-filter="grayscale">Đen trắng</button>
+            </div>
+          </div>
+
+          <div class="tool-action-bar">
+            <button class="btn btn-secondary btn-sm" id="btnResetScannerPins">Đặt lại 4 góc</button>
+            <button class="btn btn-primary btn-sm" id="btnApplyWarpAction">Nắn Phẳng Ảnh</button>
+          </div>
+        </div>
+
+        <!-- TAB 4: COLLAGE PANEL (Injected by CollageUI) -->
+        <div class="tool-panel" id="panelCollage"></div>
+      </aside>
+    </main>
+
+    <!-- 4. BOTTOM NAVIGATION DOCK (Mobile-first, 48px touch targets) -->
+    <nav class="bottom-nav" role="navigation" aria-label="Thanh công cụ chính">
+      <button class="nav-tab active" data-tab="crop" aria-label="Cắt ảnh">
+        <div class="nav-tab-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2v14a2 2 0 0 0 2 2h14"/>
+            <path d="M18 22V8a2 2 0 0 0-2-2H2"/>
+          </svg>
+        </div>
+        <span class="nav-tab-label">Cắt ảnh</span>
+      </button>
+
+      <button class="nav-tab" data-tab="resize" aria-label="Đổi kích thước">
+        <div class="nav-tab-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 3 21 3 21 9"/>
+            <polyline points="9 21 3 21 3 15"/>
+            <line x1="21" y1="3" x2="14" y2="10"/>
+            <line x1="3" y1="21" x2="10" y2="14"/>
+          </svg>
+        </div>
+        <span class="nav-tab-label">Đổi cỡ</span>
+      </button>
+
+      <button class="nav-tab" data-tab="scanner" aria-label="Căn ảnh 4 góc">
+        <div class="nav-tab-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <circle cx="8" cy="12" r="1"/>
+            <circle cx="16" cy="12" r="1"/>
+            <circle cx="8" cy="16" r="1"/>
+            <circle cx="16" cy="16" r="1"/>
+          </svg>
+        </div>
+        <span class="nav-tab-label">Căn 4 góc</span>
+      </button>
+
+      <button class="nav-tab" data-tab="collage" aria-label="Ghép ảnh lưới">
+        <div class="nav-tab-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect width="7" height="7" x="3" y="3" rx="1"/>
+            <rect width="7" height="7" x="14" y="3" rx="1"/>
+            <rect width="7" height="7" x="14" y="14" rx="1"/>
+            <rect width="7" height="7" x="3" y="14" rx="1"/>
+          </svg>
+        </div>
+        <span class="nav-tab-label">Ghép ảnh</span>
+      </button>
+    </nav>
+
+    <!-- 5. EXPORT MODAL -->
+    <div class="dialog-backdrop" id="exportModal" role="dialog" aria-modal="true" aria-labelledby="exportModalTitle">
+      <div class="dialog-panel">
+        <div class="dialog-header">
+          <h2 class="dialog-title" id="exportModalTitle">Xuất Ảnh Đã Chỉnh Sửa</h2>
+          <button class="btn-icon" id="btnCloseExportModal" aria-label="Đóng cửa sổ">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="dialog-body">
+          <div style="display: flex; gap: 16px; align-items: center;">
+            <canvas id="exportPreviewCanvas" style="width: 90px; height: 90px; object-fit: contain; border: 1px solid var(--border-base); border-radius: var(--radius-sm);"></canvas>
+            <div>
+              <div style="font-weight: 700; font-size: 15px;" id="exportDimLabel" class="tabular-nums">1920 × 1080 px</div>
+              <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;" id="exportSizeEst">Ước tính: ~350 KB</div>
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label" style="display:block; margin-bottom: 6px;">Định dạng tệp:</label>
+            <div class="chip-group">
+              <button class="chip active" data-export-fmt="image/webp">WebP (Khuyến nghị)</button>
+              <button class="chip" data-export-fmt="image/jpeg">JPEG</button>
+              <button class="chip" data-export-fmt="image/png">PNG (Nét không nén)</button>
+            </div>
+          </div>
+
+          <div id="qualitySliderGroup">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <label class="form-label">Chất lượng nén:</label>
+              <span class="tabular-nums" style="font-size: 13px; font-weight: 600;" id="exportQualityVal">90%</span>
+            </div>
+            <input type="range" class="slider-input" id="exportQualitySlider" min="20" max="100" value="90">
+          </div>
+        </div>
+        <div class="dialog-footer">
+          <button class="btn btn-secondary" id="btnExportShare">Chia sẻ (Share)</button>
+          <button class="btn btn-primary" id="btnExportDownload">Tải về máy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. IOS INSTALL MODAL (Compliant with pwa-standards) -->
+    <div class="dialog-backdrop" id="iosInstallModal" role="dialog" aria-modal="true" aria-labelledby="iosModalTitle">
+      <div class="dialog-panel" style="max-width: 420px;">
+        <div class="dialog-header">
+          <h2 class="dialog-title" id="iosModalTitle">Cài đặt PicStudio trên iOS</h2>
+          <button class="btn-icon" id="btnCloseIosModal" aria-label="Đóng">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="dialog-body" style="font-size: 14px; line-height: 1.6;">
+          <p>Để cài đặt ứng dụng vào màn hình chính của iPhone / iPad:</p>
+          <ol style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+            <li>Nhấn vào nút <strong>Chia sẻ</strong> (biểu tượng hình vuông có mũi tên <span style="font-size: 16px;">⎋</span>) ở thanh dưới cùng Safari.</li>
+            <li>Cuộn xuống và chọn <strong>"Thêm vào Màn hình chính" (Add to Home Screen)</strong>.</li>
+            <li>Nhấn <strong>"Thêm" (Add)</strong> ở góc trên bên phải để hoàn tất.</li>
+          </ol>
+        </div>
+        <div class="dialog-footer">
+          <button class="btn btn-primary" id="btnOkIosModal" style="width: 100%;">Đã hiểu</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. SNACKBAR NOTIFICATION -->
+    <div class="snackbar" id="snackbar" role="status" aria-live="polite">
+      <span id="snackbarText">Thông báo</span>
+    </div>
+  </div>
+
+  <!-- Main JavaScript App Entry -->
+  <script type="module" src="./src/main.ts?v=1"></script>
+</body>
+</html>

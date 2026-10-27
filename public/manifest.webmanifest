@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "id": "/pwa-pic-collage/",
+  "name": "PicStudio - Chỉnh Sửa & Ghép Ảnh",
+  "short_name": "PicStudio",
+  "description": "Công cụ chỉnh sửa ảnh, căn tài liệu 4 góc, resize và ghép ảnh lưới PWA tiện lợi, 100% bảo mật ngoại tuyến.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "lang": "vi",
+  "categories": ["photo", "utilities", "productivity"],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/maskable-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Cắt ảnh (Crop)",
+      "short_name": "Crop",
+      "description": "Cắt ảnh theo tỉ lệ chuẩn",
+      "url": "./?tool=crop",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Căn tài liệu 4 góc",
+      "short_name": "Căn 4 góc",
+      "description": "Nắn phẳng tài liệu từ ảnh chụp nghiêng",
+      "url": "./?tool=scanner",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Ghép ảnh (Collage)",
+      "short_name": "Collage",
+      "description": "Ghép ảnh theo lưới",
+      "url": "./?tool=collage",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "./",
+      "accept": {
+        "image/*": [".jpg", ".jpeg", ".png", ".webp"]
+      }
+    }
+  ]
+}

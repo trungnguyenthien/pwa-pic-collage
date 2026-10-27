@@ -1,0 +1,243 @@
+/* Overlays Styling: Crop Box, 4-Pin Scanner, Magnifier Loupe, Collage Grid */
+
+/* 1. CROP OVERLAY */
+.crop-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.crop-box {
+  position: absolute;
+  box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.45);
+  border: 2px solid #ffffff;
+  outline: 1px solid rgba(139, 92, 246, 0.8);
+  pointer-events: auto;
+  cursor: move;
+  touch-action: none;
+}
+
+/* Rule of Thirds Grid */
+.crop-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  pointer-events: none;
+}
+.crop-grid-line {
+  border-right: 1px dashed rgba(255, 255, 255, 0.55);
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.55);
+}
+
+/* 8 Resize Handles */
+.crop-handle {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: #ffffff;
+  border: 2px solid var(--brand-purple);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+  pointer-events: auto;
+  touch-action: none;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+.crop-handle-tl { top: 0; left: 0; cursor: nwse-resize; }
+.crop-handle-tc { top: 0; left: 50%; cursor: ns-resize; }
+.crop-handle-tr { top: 0; left: 100%; cursor: nesw-resize; }
+.crop-handle-ml { top: 50%; left: 0; cursor: ew-resize; }
+.crop-handle-mr { top: 50%; left: 100%; cursor: ew-resize; }
+.crop-handle-bl { top: 100%; left: 0; cursor: nesw-resize; }
+.crop-handle-bc { top: 100%; left: 50%; cursor: ns-resize; }
+.crop-handle-br { top: 100%; left: 100%; cursor: nwse-resize; }
+
+/* 2. PERSPECTIVE SCANNER OVERLAY */
+.scanner-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.scanner-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.scanner-quad {
+  fill: rgba(6, 182, 212, 0.15);
+  stroke: var(--brand-cyan);
+  stroke-width: 2.5;
+  stroke-dasharray: 6 3;
+}
+
+.scanner-pin {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 3px solid var(--brand-cyan);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.6), var(--shadow-md);
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  pointer-events: auto;
+  touch-action: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+}
+.scanner-pin:active {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.2);
+  border-color: var(--brand-purple);
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.8), var(--shadow-lg);
+}
+.scanner-pin-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brand-purple);
+}
+
+/* 3. MAGNIFIER LOUPE (Pixel Precision Zoom for Touch/Mouse) */
+.magnifier-loupe {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.35);
+  overflow: hidden;
+  pointer-events: none;
+  display: none;
+  z-index: 100;
+  background: #ffffff;
+}
+.magnifier-loupe.active {
+  display: block;
+}
+.magnifier-canvas {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+.magnifier-crosshair {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.magnifier-crosshair::before,
+.magnifier-crosshair::after {
+  content: '';
+  position: absolute;
+  background: var(--brand-cyan);
+}
+.magnifier-crosshair::before {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  transform: translateY(-50%);
+}
+.magnifier-crosshair::after {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  transform: translateX(-50%);
+}
+
+/* 4. COLLAGE GRID OVERLAY */
+.collage-workspace {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.collage-board {
+  position: relative;
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.collage-cell {
+  position: relative;
+  background: var(--bg-hover);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+.collage-cell.drag-over {
+  outline: 3px dashed var(--brand-purple);
+  background: var(--brand-gradient-soft);
+}
+
+.collage-cell img {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  max-width: none;
+  max-height: none;
+}
+
+.collage-cell-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.collage-cell-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.collage-cell:hover .collage-cell-actions,
+.collage-cell:focus-within .collage-cell-actions {
+  opacity: 1;
+}
+
+.collage-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border-base);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-xs);
+}
+.collage-action-btn:hover {
+  background: #ffffff;
+  color: var(--brand-purple);
+}
