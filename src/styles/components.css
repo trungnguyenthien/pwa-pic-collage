@@ -91,6 +91,50 @@
   border-radius: var(--radius-sm);
   background: var(--bg-surface);
   border: 1px solid var(--border-base);
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-icon-subtle:hover {
+  background: var(--bg-hover);
+  color: var(--brand-purple);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+.btn-icon-subtle:active {
+  transform: scale(0.92);
+}
+
+.crop-toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.icon-toolbar-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--bg-hover);
+  padding: 3px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-base);
+}
+
+.icon-toolbar-group .btn-icon-subtle {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border: none;
+  background: transparent;
+}
+.icon-toolbar-group .btn-icon-subtle:hover {
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 /* 2. CHIPS & PRESET PILLS */

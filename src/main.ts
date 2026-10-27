@@ -449,12 +449,14 @@ class PicStudioApp {
     const btnRotL = document.getElementById('btnRotateLeft');
     const btnRotR = document.getElementById('btnRotateRight');
     const btnFlipH = document.getElementById('btnFlipH');
+    const btnFlipV = document.getElementById('btnFlipV');
     const btnResetCrop = document.getElementById('btnResetCrop');
     const btnApplyCrop = document.getElementById('btnApplyCropAction');
 
     if (btnRotL) btnRotL.onclick = () => this.cropUI.rotate(-90);
     if (btnRotR) btnRotR.onclick = () => this.cropUI.rotate(90);
     if (btnFlipH) btnFlipH.onclick = () => this.cropUI.flip(true, false);
+    if (btnFlipV) btnFlipV.onclick = () => this.cropUI.flip(false, true);
     if (btnResetCrop) {
       btnResetCrop.onclick = () => {
         document.querySelectorAll('#panelCrop [data-crop-ratio]').forEach(c => c.classList.remove('active'));
