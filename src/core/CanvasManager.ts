@@ -61,8 +61,12 @@ export class CanvasManager {
   }
 
   public syncStageDimensions(width: number, height: number): void {
-    this.canvas.width = width;
-    this.canvas.height = height;
+    if (this.canvas.width !== width) {
+      this.canvas.width = width;
+    }
+    if (this.canvas.height !== height) {
+      this.canvas.height = height;
+    }
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
     this.stageEl.style.width = `${width}px`;
@@ -123,8 +127,6 @@ export class CanvasManager {
 
   public fitToViewport(): void {
     if (!this.hasImage || this.canvas.width === 0 || this.canvas.height === 0) return;
-
-    this.syncStageDimensions(this.canvas.width, this.canvas.height);
 
     const viewportRect = this.viewportEl.getBoundingClientRect();
     const padding = 16;

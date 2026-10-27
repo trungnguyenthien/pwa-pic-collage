@@ -107,7 +107,30 @@ export class CropUI {
    */
   public maximizeCropFrame(): void {
     const dims = this.canvasManager.getDimensions();
-    this.cropBox = CropEngine.getDefaultCropBox(dims.width, dims.height, this.currentPreset);
+    if (dims.width <= 0 || dims.height <= 0) return;
+
+    const ratio = CropEngine.getAspectRatioValue(this.currentPreset);
+    if (!ratio) {
+      this.cropBox = {
+        x: 0,
+        y: 0,
+        width: dims.width,
+        height: dims.height,
+      };
+    } else {
+      let w = dims.width;
+      let h = w / ratio;
+      if (h > dims.height) {
+        h = dims.height;
+        w = h * ratio;
+      }
+      this.cropBox = {
+        x: Math.round((dims.width - w) / 2),
+        y: Math.round((dims.height - h) / 2),
+        width: Math.round(w),
+        height: Math.round(h),
+      };
+    }
     this.syncDOM();
   }
 
@@ -188,6 +211,12 @@ export class CropUI {
 
   private syncDOM(): void {
     if (!this.cropBoxEl) return;
+    if (this.cropBox.width === 0 || this.cropBox.height === 0) {
+      const dims = this.canvasManager.getDimensions();
+      if (dims.width > 0 && dims.height > 0) {
+        this.cropBox = CropEngine.getDefaultCropBox(dims.width, dims.height, this.currentPreset);
+      }
+    }
     this.cropBoxEl.style.left = `${this.cropBox.x}px`;
     this.cropBoxEl.style.top = `${this.cropBox.y}px`;
     this.cropBoxEl.style.width = `${this.cropBox.width}px`;

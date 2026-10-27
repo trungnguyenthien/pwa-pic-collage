@@ -144,9 +144,6 @@ class PicStudioApp {
   private loadQueueItemToCanvas(item: QueueItem): void {
     this.showWorkspace();
     this.canvasManager.loadFromCanvas(item.canvas);
-    const hudDim = document.getElementById('hudDimensions');
-    if (hudDim) hudDim.textContent = `${item.canvas.width} × ${item.canvas.height} px`;
-    this.switchTab(this.currentTab);
   }
 
   private bindFileLoading(): void {

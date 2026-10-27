@@ -22,30 +22,37 @@ export class CropEngine {
     imgHeight: number,
     preset: AspectRatioPreset = 'free'
   ): Rect {
+    if (imgWidth <= 0 || imgHeight <= 0) {
+      return { x: 0, y: 0, width: 0, height: 0 };
+    }
+
     const ratio = this.getAspectRatioValue(preset);
     if (!ratio) {
-      // Freeform: fits 100% of the image frame immediately
+      // Freeform: 85% centered box with clear visible margin so user immediately sees the crop frame
+      const margin = 0.075;
+      const w = Math.max(50, Math.round(imgWidth * (1 - margin * 2)));
+      const h = Math.max(50, Math.round(imgHeight * (1 - margin * 2)));
       return {
-        x: 0,
-        y: 0,
-        width: imgWidth,
-        height: imgHeight,
+        x: Math.round((imgWidth - w) / 2),
+        y: Math.round((imgHeight - h) / 2),
+        width: w,
+        height: h,
       };
     }
 
-    // Aspect ratio presets: maximize fit within image bounds without arbitrary margins
-    let w = imgWidth;
+    // Aspect ratio presets: 85% centered within image bounds
+    let w = imgWidth * 0.85;
     let h = w / ratio;
-    if (h > imgHeight) {
-      h = imgHeight;
+    if (h > imgHeight * 0.85) {
+      h = imgHeight * 0.85;
       w = h * ratio;
     }
 
     return {
       x: Math.round((imgWidth - w) / 2),
       y: Math.round((imgHeight - h) / 2),
-      width: Math.round(w),
-      height: Math.round(h),
+      width: Math.max(50, Math.round(w)),
+      height: Math.max(50, Math.round(h)),
     };
   }
 
